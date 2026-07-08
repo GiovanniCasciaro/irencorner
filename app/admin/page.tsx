@@ -1,29 +1,23 @@
 export const dynamic = "force-dynamic";
 
 import { SubmissionTable } from "@/components/admin/SubmissionTable";
-import { prisma } from "@/lib/db";
+import { listSubmissions } from "@/lib/store";
 
 export default async function AdminPage() {
-  const submissions = await prisma.submission.findMany({
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      createdAt: true,
-      email: true,
-      ragioneSociale: true,
-      partitaIva: true,
-      provincia: true,
-      comune: true,
-      excelUrl: true,
-    },
-  });
+  const submissions = await listSubmissions();
 
   return (
     <main className="admin-shell">
       <SubmissionTable
         submissions={submissions.map((submission) => ({
-          ...submission,
-          createdAt: submission.createdAt.toISOString(),
+          id: submission.id,
+          createdAt: submission.createdAt,
+          email: submission.email,
+          ragioneSociale: submission.ragioneSociale,
+          partitaIva: submission.partitaIva,
+          provincia: submission.provincia,
+          comune: submission.comune,
+          excelUrl: submission.excelUrl,
         }))}
       />
     </main>

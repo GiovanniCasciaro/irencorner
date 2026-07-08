@@ -35,8 +35,6 @@ yarn-error.log*
 
 # local data
 /data/
-/prisma/*.db
-/prisma/*.db-journal
 
 # vercel
 .vercel

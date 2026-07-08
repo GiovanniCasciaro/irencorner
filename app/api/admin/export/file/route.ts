@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-import { readLocalSubmissionExcel, saveSubmissionExcel } from "@/lib/excel";
+import { getSubmission, getSubmissionExcel } from "@/lib/store";
 import { hasBlobStorage } from "@/lib/env";
 
 export async function GET(request: Request) {
@@ -17,7 +16,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const submission = await prisma.submission.findUnique({ where: { id } });
+  const submission = await getSubmission(id);
   if (!submission) {
     return NextResponse.json(
       { error: "Candidatura non trovata." },
@@ -29,40 +28,12 @@ export async function GET(request: Request) {
     return NextResponse.redirect(submission.excelUrl);
   }
 
-  const fileName = submission.excelFileName;
-  if (!fileName) {
-    return NextResponse.json(
-      { error: "File Excel non disponibile per questa candidatura." },
-      { status: 404 },
-    );
-  }
-
-  try {
-    const file = await readLocalSubmissionExcel(submission.id, fileName);
-    return new NextResponse(new Uint8Array(file), {
-      headers: {
-        "Content-Type":
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "Content-Disposition": `attachment; filename="${fileName}"`,
-      },
-    });
-  } catch {
-    const excel = await saveSubmissionExcel(submission);
-    await prisma.submission.update({
-      where: { id: submission.id },
-      data: {
-        excelUrl: excel.url,
-        excelFileName: excel.fileName,
-      },
-    });
-
-    const file = await readLocalSubmissionExcel(submission.id, excel.fileName);
-    return new NextResponse(new Uint8Array(file), {
-      headers: {
-        "Content-Type":
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "Content-Disposition": `attachment; filename="${excel.fileName}"`,
-      },
-    });
-  }
+  const { buffer, fileName } = await getSubmissionExcel(submission);
+  return new NextResponse(new Uint8Array(buffer), {
+    headers: {
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Content-Disposition": `attachment; filename="${fileName}"`,
+    },
+  });
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FORM_FIELDS } from "@/lib/fields";
 import { getSubmissionExcelDownloadUrl } from "@/lib/submission";
-import { prisma } from "@/lib/db";
+import { getSubmission } from "@/lib/store";
 
 export default async function AdminDetailPage({
   params,
@@ -12,7 +12,7 @@ export default async function AdminDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const submission = await prisma.submission.findUnique({ where: { id } });
+  const submission = await getSubmission(id);
 
   if (!submission) {
     notFound();
@@ -34,7 +34,7 @@ export default async function AdminDetailPage({
             <h1 style={{ marginTop: "1rem" }}>{submission.ragioneSociale}</h1>
             <p className="hero-subtitle">
               Ricevuta il{" "}
-              {submission.createdAt.toLocaleString("it-IT", {
+              {new Date(submission.createdAt).toLocaleString("it-IT", {
                 dateStyle: "full",
                 timeStyle: "short",
               })}

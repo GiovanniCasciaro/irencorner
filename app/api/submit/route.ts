@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
 import { submissionSchema } from "@/lib/validation";
-import { saveSubmissionExcel } from "@/lib/excel";
+import { createSubmission } from "@/lib/store";
 
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
@@ -62,16 +61,7 @@ export async function POST(request: Request) {
 
     const { website: _website, ...data } = parsed.data;
 
-    const submission = await prisma.submission.create({ data });
-    const excel = await saveSubmissionExcel(submission);
-
-    await prisma.submission.update({
-      where: { id: submission.id },
-      data: {
-        excelUrl: excel.url,
-        excelFileName: excel.fileName,
-      },
-    });
+    await createSubmission(data);
 
     return NextResponse.json({
       success: true,

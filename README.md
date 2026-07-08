@@ -1,18 +1,19 @@
 # Iren Corner
 
-Landing page e form di candidatura partner IREN con salvataggio dati su Postgres, export Excel su Vercel Blob e pannello admin.
+Landing page e form di candidatura partner IREN. I dati e un file Excel dedicato per ogni candidatura vengono salvati su Vercel Blob (in locale sul filesystem), con pannello admin protetto.
 
 ## Funzionalità
 
 - Pagina informativa con offerte, provvigioni e istruzioni
-- Form con 13 campi (allineati all'Excel) + upload documento identità e visura camerale
+- Form con 13 campi allineati all'Excel
 - Generazione automatica di un file Excel dedicato per ogni candidatura
 - Area admin protetta da password (`/admin`)
+- Nessun database richiesto: tutto su Vercel Blob
 
 ## Requisiti
 
 - Node.js 20+
-- Account Vercel con Postgres e Blob abilitati
+- Account Vercel con Blob abilitato (per la produzione)
 
 ## Setup locale
 
@@ -22,18 +23,12 @@ Landing page e form di candidatura partner IREN con salvataggio dati su Postgres
 cp .env.example .env.local
 ```
 
-2. Compila `.env.local` con i valori reali di database, blob e credenziali admin.
+2. Compila `.env.local` con `ADMIN_PASSWORD` e `SESSION_SECRET`. In locale il token Blob è opzionale: se assente, i dati vengono salvati nella cartella `./data`.
 
-3. Installa dipendenze e applica le migration:
+3. Installa le dipendenze e avvia il server:
 
 ```bash
 npm install
-npx prisma migrate deploy
-```
-
-4. Avvia il server di sviluppo:
-
-```bash
 npm run dev
 ```
 
@@ -42,23 +37,23 @@ Apri [http://localhost:3000](http://localhost:3000). L'area admin è su [http://
 ## Deploy su Vercel
 
 1. Collega il repository a Vercel e importa il progetto.
-2. Dal dashboard Vercel, crea:
-   - **Storage → Postgres** e collega `DATABASE_URL`
-   - **Storage → Blob** e collega `BLOB_READ_WRITE_TOKEN`
+2. Dal dashboard Vercel crea **Storage → Blob**: la variabile `BLOB_READ_WRITE_TOKEN` viene aggiunta automaticamente al progetto.
 3. Aggiungi le variabili ambiente:
    - `ADMIN_PASSWORD`
    - `SESSION_SECRET` (stringa casuale ≥ 32 caratteri)
-4. Il comando di build esegue automaticamente `prisma generate`, `prisma migrate deploy` e `next build`.
-5. Configura il dominio custom del progetto (es. `irencorner.tuodominio.it`):
-   - Aggiungi un record CNAME verso `cname.vercel-dns.com`
-   - Associa il dominio nel progetto Vercel
+4. Deploy. Il build esegue solo `next build`, senza dipendenze da database.
+5. (Opzionale) Configura un dominio custom nel progetto Vercel.
 
 ## Struttura Excel
 
-Il file generato contiene un foglio `Candidature` con header colorati:
+Ogni candidatura genera un file Excel personale (`candidatura-<ragione-sociale>.xlsx`) con un foglio `Candidatura`:
 
 - Colonne A–E (blu): dati legali e contatto
 - Colonne F–M (arancione): sede operativa e profilo commerciale
 
-Ogni candidatura genera un Excel personale con una sola riga dati, scaricabile dall'admin per cliente.
+Header colorati e in grassetto, con una riga contenente i dati del cliente. Scaricabile dall'admin per ogni cliente.
+
+## Note operative
+
+- Storage: `submissions/{id}/data.json` (dati) e `submissions/{id}/candidatura-*.xlsx` (Excel).
 - Il form include honeypot e rate limit base (5 invii/ora per IP).
