@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { submissionSchema } from "@/lib/validation";
 import { createSubmission } from "@/lib/store";
 
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
-const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX = 30;
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(ip: string) {
