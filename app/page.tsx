@@ -1,66 +1,38 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { ContentSections } from "@/components/ContentSections";
+import { PartnerForm } from "@/components/PartnerForm";
+import { SiteHeader } from "@/components/SiteHeader";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <>
+      <SiteHeader />
+      <main>
+        <section className="page-hero">
+          <p className="eyebrow-line">Collabora con noi</p>
+          <h1>
+            Iren Corner: energia, processi digitali e supporto dedicato per la
+            tua agenzia
+          </h1>
+          <p className="hero-subtitle">
+            Offerte competitive, compensi strutturati e operatività immediata
+            tramite IrenForce per la tua agenzia.
           </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        </section>
+
+        <ContentSections />
+
+        <section className="section" id="candidatura">
+          <div className="section-head">
+            <p className="eyebrow-line">Candidatura</p>
+            <h2>Compila il form</h2>
+            <p>
+              Inserisci i dati aziendali. Dopo l&apos;approvazione di IREN
+              riceverai il contratto via email.
+            </p>
+          </div>
+          <PartnerForm />
+        </section>
       </main>
-    </div>
+    </>
   );
 }

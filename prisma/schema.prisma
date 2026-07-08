@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Submission {
+  id                   String   @id @default(cuid())
+  createdAt            DateTime @default(now())
+  email                String
+  nomeCognome          String
+  ragioneSociale       String
+  partitaIva           String
+  sedeLegale           String
+  indirizzoOperativo   String
+  comune               String
+  cap                  String
+  provincia            String
+  regione              String
+  tipologiaAttivita    String
+  esperienzaEnergetico String
+  altriCompetitor      String
+  excelUrl             String?
+  excelFileName        String?
+}

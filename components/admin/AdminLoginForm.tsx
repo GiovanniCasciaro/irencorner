@@ -1,0 +1,62 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+
+export function AdminLoginForm() {
+  const router = useRouter();
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error ?? "Accesso non riuscito.");
+        return;
+      }
+
+      router.push("/admin");
+      router.refresh();
+    } catch {
+      setError("Errore di rete.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form className="contact-form login-form" onSubmit={handleSubmit}>
+      <h1 style={{ marginBottom: "0.5rem" }}>Area Admin</h1>
+      <p className="hero-subtitle" style={{ marginBottom: "1.5rem" }}>
+        Accedi per visualizzare le candidature e scaricare l&apos;Excel.
+      </p>
+      <div className="input-group">
+        <label htmlFor="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+        />
+      </div>
+      <button className="btn btn-primary" type="submit" disabled={loading}>
+        {loading ? "Accesso..." : "Accedi"}
+      </button>
+      {error ? <p className="form-status error">{error}</p> : null}
+    </form>
+  );
+}
