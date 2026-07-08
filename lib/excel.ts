@@ -5,8 +5,12 @@ import type { Submission } from "@/lib/types";
 const LEGAL_FILL = "FFBDD7EE";
 const OPERATIVO_FILL = "FFF8CBAD";
 
+function toSingleLine(value: string) {
+  return value.replace(/\s*\r?\n\s*/g, " ").replace(/\s{2,}/g, " ").trim();
+}
+
 export function submissionToRow(submission: Submission) {
-  return FIELD_KEYS.map((key) => submission[key]);
+  return FIELD_KEYS.map((key) => toSingleLine(submission[key] ?? ""));
 }
 
 export function buildExcelFileName(submission: Pick<Submission, "ragioneSociale">) {
@@ -51,9 +55,9 @@ export async function buildWorkbook(submission: Submission) {
   });
 
   const row = sheet.addRow(submissionToRow(submission));
-  row.alignment = { vertical: "top", wrapText: true };
+  row.alignment = { vertical: "middle", wrapText: false };
 
-  headerRow.height = 42;
+  headerRow.height = 32;
   sheet.views = [{ state: "frozen", ySplit: 1 }];
 
   const buffer = await workbook.xlsx.writeBuffer();
