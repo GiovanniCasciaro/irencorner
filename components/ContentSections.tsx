@@ -48,36 +48,32 @@ export function ContentSections() {
             <span className="offer-badge">Prezzo fisso</span>
             <h3>Sottocasa Special — RID o Bollettino</h3>
             <ul>
-              <li>Luce: 0,12 €/kWh (perdite incluse)</li>
-              <li>Gas: 0,43 €/Smc</li>
+              <li>Luce: 0,10 €/kWh (perdite incluse)</li>
+              <li>Gas: 0,44 €/Smc</li>
             </ul>
           </article>
-          <article className="offer-card">
-            <span className="offer-badge">Prezzo fisso</span>
-            <h3>36 Fisso Summer Edition</h3>
-            <p>F1: 0,109 €/kWh (perdite incluse)</p>
-          </article>
+          
           <article className="offer-card">
             <span className="offer-badge">Prezzo fisso</span>
             <h3>Tua Azienda — RID o Bollettino</h3>
             <ul>
-              <li>Luce: 0,145 €/kWh (perdite incluse)</li>
+              <li>Luce: 0,15 €/kWh (perdite incluse)</li>
               <li>Gas: 0,56 €/Smc</li>
               <li>Piano compensi ricorrente basato sui consumi in fornitura</li>
             </ul>
           </article>
           <article className="offer-card">
-            <span className="offer-badge suspended">Sospesa</span>
+            <span className="offer-badge">Vendita Bundle</span>
             <h3>Stay Tech</h3>
             <p>
               Con televisore in regalo o acquisto e-bike rateizzato in bolletta
-              (attualmente sospesa)
+               con offerta prezzo fisso di 0,13 €/kWh
             </p>
           </article>
           <article className="offer-card">
             <span className="offer-badge">Pertinenze</span>
             <h3>Offerta &quot;10 per due&quot;</h3>
-            <p>Costo di commercializzazione: 55 €</p>
+            <p>Costo di commercializzazione: 55 € e PUN+0,02 €/kWh</p>
           </article>
           <article className="offer-card">
             <span className="offer-badge">TLC</span>
@@ -130,10 +126,9 @@ export function ContentSections() {
               </tr>
             </tbody>
           </table>
-          <p className="commission-note">
+          <p className="commission-note" style={{ fontWeight: "bold" }}>
             A tutti i compensi si aggiunge un bonus di 15€ per ogni contratto
-            che rimane attivo per 9 mesi, per un totale di 115€ a contratto
-            (sulle offerte low cost).
+            che rimane attivo per 9 mesi, per un totale di 115€ a contratto.
           </p>
         </div>
       </section>
@@ -157,7 +152,6 @@ export function ContentSections() {
               Dovrà allegare: documento di identità e visura camerale (non
               antecedente a 6 mesi).
             </li>
-            <li>Resto disponibile per qualsiasi chiarimento.</li>
           </ul>
         </div>
       </section>
