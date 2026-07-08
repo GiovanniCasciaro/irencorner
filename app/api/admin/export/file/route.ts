@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { getSubmission, getSubmissionExcel } from "@/lib/store";
-import { hasBlobStorage } from "@/lib/env";
 
 export async function GET(request: Request) {
   if (!(await isAdminAuthenticated())) {
@@ -24,16 +23,20 @@ export async function GET(request: Request) {
     );
   }
 
-  if (hasBlobStorage() && submission.excelUrl) {
-    return NextResponse.redirect(submission.excelUrl);
+  try {
+    const { buffer, fileName } = await getSubmissionExcel(submission);
+    return new NextResponse(new Uint8Array(buffer), {
+      headers: {
+        "Content-Type":
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Content-Disposition": `attachment; filename="${fileName}"`,
+      },
+    });
+  } catch (error) {
+    console.error("Excel download error:", error);
+    return NextResponse.json(
+      { error: "File Excel non disponibile per questa candidatura." },
+      { status: 404 },
+    );
   }
-
-  const { buffer, fileName } = await getSubmissionExcel(submission);
-  return new NextResponse(new Uint8Array(buffer), {
-    headers: {
-      "Content-Type":
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": `attachment; filename="${fileName}"`,
-    },
-  });
 }

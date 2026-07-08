@@ -1,3 +1,7 @@
+export function isVercelRuntime() {
+  return process.env.VERCEL === "1";
+}
+
 export function getSessionSecret() {
   const secret =
     process.env.SESSION_SECRET ??
@@ -14,4 +18,12 @@ export function getSessionSecret() {
 
 export function hasBlobStorage() {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+}
+
+export function assertStorageAvailable() {
+  if (isVercelRuntime() && !hasBlobStorage()) {
+    throw new Error(
+      "Storage non configurato: collega Vercel Blob al progetto e imposta BLOB_READ_WRITE_TOKEN.",
+    );
+  }
 }

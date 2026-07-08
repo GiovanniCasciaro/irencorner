@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { submissionSchema } from "@/lib/validation";
 import { createSubmission } from "@/lib/store";
 
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 30;
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -70,6 +73,35 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Submit error:", error);
+
+    if (error instanceof Error) {
+      if (
+        error.message.includes("BLOB_READ_WRITE_TOKEN") ||
+        error.message.includes("Storage non configurato")
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Servizio temporaneamente non disponibile. Contatta l'amministratore del sito.",
+          },
+          { status: 503 },
+        );
+      }
+
+      if (
+        error.message.includes("Vercel Blob") ||
+        error.message.includes("Impossibile salvare la candidatura su Vercel Blob")
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Impossibile salvare la candidatura. Riprova tra qualche minuto.",
+          },
+          { status: 503 },
+        );
+      }
+    }
+
     return NextResponse.json(
       { error: "Errore durante l'invio. Riprova più tardi." },
       { status: 500 },
