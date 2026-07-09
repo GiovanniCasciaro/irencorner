@@ -3,8 +3,9 @@ import JSZip from "jszip";
 import { EXCEL_HEADERS, FIELD_KEYS } from "@/lib/fields";
 import type { Submission } from "@/lib/types";
 
-const LEGAL_FILL = "FFD9E4F5";
-const OPERATIVO_FILL = "FFD9F0E3";
+const LEGAL_FILL = "FFBDD7EE";
+const OPERATIVO_FILL = "FFF8CBAD";
+const DATA_FILL = "FFFFFF00";
 
 function toSingleLine(value: string) {
   return value
@@ -47,6 +48,11 @@ function styleHeaderCell(cell: ExcelJS.Cell, index: number) {
 }
 
 function styleDataCell(cell: ExcelJS.Cell) {
+  cell.fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: DATA_FILL },
+  };
   cell.alignment = { vertical: "middle", horizontal: "left", wrapText: false };
   cell.border = {
     top: { style: "thin", color: { argb: "FFDDDDDD" } },
@@ -70,7 +76,7 @@ function trimWorksheetToTwoRows(sheet: ExcelJS.Worksheet) {
 
   for (let rowNumber = 1; rowNumber <= 2; rowNumber += 1) {
     const row = sheet.getRow(rowNumber);
-    row.height = rowNumber === 1 ? 22 : 18;
+    row.height = rowNumber === 1 ? 42 : 18;
     row.eachCell({ includeEmpty: true }, (cell) => {
       cell.alignment = {
         ...cell.alignment,
@@ -124,6 +130,13 @@ async function enforceTwoRowXlsx(buffer: Buffer) {
     /<row\b[^>]*\br="(\d+)"[^>]*>[\s\S]*?<\/row>/g,
     (match, rowNumber) => (Number(rowNumber) <= 2 ? match : ""),
   );
+
+  const hiddenRows = Array.from({ length: 498 }, (_, index) => {
+    const rowNumber = index + 3;
+    return `<row r="${rowNumber}" hidden="1" spans="1:13"/>`;
+  }).join("");
+  xml = xml.replace("</sheetData>", `${hiddenRows}</sheetData>`);
+
   zip.file(sheetPath, xml);
   return Buffer.from(
     await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }),
