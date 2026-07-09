@@ -30,6 +30,7 @@ export async function GET(request: Request) {
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "Content-Disposition": `attachment; filename="${fileName}"`,
+        "Cache-Control": "no-store, no-cache, must-revalidate",
       },
     });
   } catch (error) {

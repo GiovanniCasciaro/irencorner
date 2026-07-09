@@ -31,6 +31,13 @@ function adminExcelUrl(id: string) {
   return `/api/admin/export/file?id=${id}`;
 }
 
+function normalizeSubmission(submission: Submission): Submission {
+  return {
+    ...submission,
+    excelUrl: adminExcelUrl(submission.id),
+  };
+}
+
 async function saveToBlob(submission: Submission, excelBuffer: Buffer) {
   const { id, excelFileName } = submission;
   if (!excelFileName) {
@@ -102,7 +109,7 @@ export async function createSubmission(
     );
   }
 
-  return submission;
+  return normalizeSubmission(submission);
 }
 
 export async function listSubmissions(): Promise<Submission[]> {
@@ -120,7 +127,8 @@ export async function listSubmissions(): Promise<Submission[]> {
         }
       }),
     );
-    submissions = results.filter((item): item is Submission => item !== null);
+    submissions = results.filter((item): item is Submission => item !== null)
+      .map(normalizeSubmission);
   } else {
     try {
       const dirs = await readdir(DATA_ROOT, { withFileTypes: true });
@@ -138,7 +146,7 @@ export async function listSubmissions(): Promise<Submission[]> {
       );
       submissions = results.filter(
         (item): item is Submission => item !== null,
-      );
+      ).map(normalizeSubmission);
     } catch {
       submissions = [];
     }
@@ -150,21 +158,25 @@ export async function listSubmissions(): Promise<Submission[]> {
 }
 
 export async function getSubmission(id: string): Promise<Submission | null> {
+  let submission: Submission | null = null;
+
   if (hasBlobStorage()) {
     try {
       const raw = await readBlobText(submissionDataPath(id));
-      return JSON.parse(raw) as Submission;
+      submission = JSON.parse(raw) as Submission;
     } catch {
-      return null;
+      submission = null;
+    }
+  } else {
+    try {
+      const raw = await readFile(localDataPath(id), "utf-8");
+      submission = JSON.parse(raw) as Submission;
+    } catch {
+      submission = null;
     }
   }
 
-  try {
-    const raw = await readFile(localDataPath(id), "utf-8");
-    return JSON.parse(raw) as Submission;
-  } catch {
-    return null;
-  }
+  return submission ? normalizeSubmission(submission) : null;
 }
 
 export async function getSubmissionExcel(

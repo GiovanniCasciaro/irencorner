@@ -1,11 +1,10 @@
 import ExcelJS from "exceljs";
+import JSZip from "jszip";
 import { EXCEL_HEADERS, FIELD_KEYS } from "@/lib/fields";
 import type { Submission } from "@/lib/types";
 
 const LEGAL_FILL = "FFD9E4F5";
 const OPERATIVO_FILL = "FFD9F0E3";
-const DATA_ROW_HEIGHT = 18;
-const HEADER_ROW_HEIGHT = 22;
 
 function toSingleLine(value: string) {
   return value
@@ -57,34 +56,69 @@ function styleDataCell(cell: ExcelJS.Cell) {
   };
 }
 
+function trimWorksheetToTwoRows(sheet: ExcelJS.Worksheet) {
+  const maxRow = sheet.actualRowCount;
+  if (maxRow > 2) {
+    sheet.spliceRows(3, maxRow - 2);
+  }
+
+  for (let rowNumber = 1; rowNumber <= 2; rowNumber += 1) {
+    const row = sheet.getRow(rowNumber);
+    row.height = rowNumber === 1 ? 22 : 18;
+    row.eachCell({ includeEmpty: true }, (cell) => {
+      cell.alignment = {
+        ...cell.alignment,
+        wrapText: false,
+        shrinkToFit: false,
+      };
+    });
+  }
+
+  sheet.pageSetup.printArea = "A1:M2";
+}
+
 export async function buildWorkbook(submission: Submission) {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet("Candidatura", {
     views: [{ state: "frozen", ySplit: 1 }],
+    properties: { defaultRowHeight: 18 },
   });
 
   EXCEL_HEADERS.forEach((header, index) => {
     sheet.getColumn(index + 1).width = Math.max(header.length + 2, 18);
   });
 
-  const headerRow = sheet.getRow(1);
-  headerRow.height = HEADER_ROW_HEIGHT;
-  EXCEL_HEADERS.forEach((header, index) => {
-    const cell = headerRow.getCell(index + 1);
-    cell.value = header;
-    styleHeaderCell(cell, index);
+  const headerValues = submissionToRow(submission);
+  const headerRow = sheet.addRow([...EXCEL_HEADERS]);
+  const dataRow = sheet.addRow([...headerValues]);
+
+  EXCEL_HEADERS.forEach((_, index) => {
+    styleHeaderCell(headerRow.getCell(index + 1), index);
+    styleDataCell(dataRow.getCell(index + 1));
   });
 
-  const dataRow = sheet.getRow(2);
-  dataRow.height = DATA_ROW_HEIGHT;
-  submissionToRow(submission).forEach((value, index) => {
-    const cell = dataRow.getCell(index + 1);
-    cell.value = value;
-    styleDataCell(cell);
-  });
+  trimWorksheetToTwoRows(sheet);
 
-  sheet.pageSetup.printArea = `A1:M2`;
+  const rawBuffer = Buffer.from(await workbook.xlsx.writeBuffer());
+  return enforceTwoRowXlsx(rawBuffer);
+}
 
-  const buffer = await workbook.xlsx.writeBuffer();
-  return Buffer.from(buffer);
+async function enforceTwoRowXlsx(buffer: Buffer) {
+  const zip = await JSZip.loadAsync(buffer);
+  const sheetPath = "xl/worksheets/sheet1.xml";
+  const sheetFile = zip.file(sheetPath);
+  if (!sheetFile) {
+    return buffer;
+  }
+
+  let xml = await sheetFile.async("string");
+  xml = xml.replace(/<dimension ref="[^"]+"/, '<dimension ref="A1:M2"');
+  xml = xml.replace(
+    /<row\b[^>]*\br="(\d+)"[^>]*>[\s\S]*?<\/row>/g,
+    (match, rowNumber) => (Number(rowNumber) <= 2 ? match : ""),
+  );
+  zip.file(sheetPath, xml);
+  return Buffer.from(
+    await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }),
+  );
 }
