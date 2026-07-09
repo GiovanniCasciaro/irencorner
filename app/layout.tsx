@@ -8,10 +8,31 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const siteUrl = process.env.APP_URL ?? "https://irencornerita.it";
+const siteTitle = "Iren Corner — Collabora con noi";
+const siteDescription =
+  "Programma commerciale Iren Corner: offerte energia, provvigioni strutturate e form di candidatura partner per agenzie.";
+
 export const metadata: Metadata = {
-  title: "Iren Corner — Collabora con noi",
-  description:
-    "Programma commerciale Iren Corner: offerte energia, provvigioni e form di candidatura partner.",
+  metadataBase: new URL(siteUrl),
+  title: siteTitle,
+  description: siteDescription,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "it_IT",
+    url: "/",
+    siteName: "Iren Corner",
+    title: siteTitle,
+    description: siteDescription,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteTitle,
+    description: siteDescription,
+  },
   robots: {
     index: true,
     follow: true,
