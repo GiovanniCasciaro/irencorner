@@ -56,6 +56,12 @@ function styleDataCell(cell: ExcelJS.Cell) {
   };
 }
 
+function hideUnusedRows(sheet: ExcelJS.Worksheet) {
+  for (let rowNumber = 3; rowNumber <= 500; rowNumber += 1) {
+    sheet.getRow(rowNumber).hidden = true;
+  }
+}
+
 function trimWorksheetToTwoRows(sheet: ExcelJS.Worksheet) {
   const maxRow = sheet.actualRowCount;
   if (maxRow > 2) {
@@ -75,6 +81,7 @@ function trimWorksheetToTwoRows(sheet: ExcelJS.Worksheet) {
   }
 
   sheet.pageSetup.printArea = "A1:M2";
+  hideUnusedRows(sheet);
 }
 
 export async function buildWorkbook(submission: Submission) {
