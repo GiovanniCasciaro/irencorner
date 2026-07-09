@@ -3,7 +3,6 @@ import path from "path";
 import { assertStorageAvailable, hasBlobStorage } from "@/lib/env";
 import {
   listSubmissionDataBlobs,
-  readBlobBuffer,
   readBlobText,
   submissionDataPath,
   submissionExcelPath,
@@ -172,21 +171,6 @@ export async function getSubmissionExcel(
   submission: Submission,
 ): Promise<{ buffer: Buffer; fileName: string }> {
   const fileName = submission.excelFileName ?? buildExcelFileName(submission);
-
-  if (hasBlobStorage()) {
-    const buffer = await readBlobBuffer(
-      submissionExcelPath(submission.id, fileName),
-    );
-    return { buffer, fileName };
-  }
-
-  try {
-    const buffer = await readFile(localExcelPath(submission.id, fileName));
-    return { buffer, fileName };
-  } catch {
-    const buffer = await buildWorkbook(submission);
-    await mkdir(localDir(submission.id), { recursive: true });
-    await writeFile(localExcelPath(submission.id, fileName), buffer);
-    return { buffer, fileName };
-  }
+  const buffer = await buildWorkbook(submission);
+  return { buffer, fileName };
 }

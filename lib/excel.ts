@@ -8,7 +8,11 @@ const DATA_ROW_HEIGHT = 18;
 const HEADER_ROW_HEIGHT = 22;
 
 function toSingleLine(value: string) {
-  return value.replace(/\s*\r?\n\s*/g, " ").replace(/\s{2,}/g, " ").trim();
+  return value
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/\s*\r?\n\s*/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }
 
 export function submissionToRow(submission: Submission) {
@@ -79,9 +83,7 @@ export async function buildWorkbook(submission: Submission) {
     styleDataCell(cell);
   });
 
-  if (sheet.rowCount > 2) {
-    sheet.spliceRows(3, sheet.rowCount - 2);
-  }
+  sheet.pageSetup.printArea = `A1:M2`;
 
   const buffer = await workbook.xlsx.writeBuffer();
   return Buffer.from(buffer);
