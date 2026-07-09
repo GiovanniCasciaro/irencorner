@@ -1,10 +1,19 @@
 "use client";
 
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+
+function safeAdminPath(value: string | null) {
+  if (!value || !value.startsWith("/admin")) {
+    return "/admin";
+  }
+  return value;
+}
 
 export function AdminLoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = safeAdminPath(searchParams.get("next"));
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +36,7 @@ export function AdminLoginForm() {
         return;
       }
 
-      router.push("/admin");
+      router.push(nextPath);
       router.refresh();
     } catch {
       setError("Errore di rete.");

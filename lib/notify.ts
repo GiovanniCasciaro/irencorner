@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { getAdminSubmissionUrl } from "@/lib/app-url";
 import type { Submission } from "@/lib/types";
 
 const DEFAULT_NOTIFIER_EMAIL = "codifiche@gruppoevolvia.it";
@@ -28,7 +29,7 @@ export function getNotifierEmail() {
 
 export async function notifyNewSubmission(
   submission: Submission,
-  appUrl: string,
+  request?: Request,
 ) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -41,7 +42,7 @@ export async function notifyNewSubmission(
   const resend = new Resend(apiKey);
   const from =
     process.env.RESEND_FROM ?? "Iren Corner <onboarding@resend.dev>";
-  const adminUrl = `${appUrl.replace(/\/$/, "")}/admin/${submission.id}`;
+  const adminUrl = getAdminSubmissionUrl(submission.id, request);
   const createdAt = formatDate(submission.createdAt);
 
   const text = [

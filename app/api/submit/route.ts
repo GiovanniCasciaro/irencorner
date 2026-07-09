@@ -15,13 +15,6 @@ const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 30;
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
-function getAppUrl(request: Request) {
-  if (process.env.APP_URL) {
-    return process.env.APP_URL.replace(/\/$/, "");
-  }
-  return new URL(request.url).origin;
-}
-
 function respondError(request: Request, message: string, status: number) {
   if (isBrowserFormSubmit(request)) {
     return NextResponse.redirect(
@@ -104,7 +97,7 @@ export async function POST(request: Request) {
     const submission = await createSubmission(data);
 
     try {
-      await notifyNewSubmission(submission, getAppUrl(request));
+      await notifyNewSubmission(submission, request);
     } catch (emailError) {
       console.error("Notification email error:", emailError);
     }
