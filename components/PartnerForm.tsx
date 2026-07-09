@@ -2,12 +2,14 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
+import { LocationFields } from "@/components/LocationFields";
 import { FORM_FIELDS } from "@/lib/fields";
 import { SUBMIT_SUCCESS_MESSAGE } from "@/lib/submit-messages";
 
 export function PartnerForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [locationResetKey, setLocationResetKey] = useState(0);
   const [status, setStatus] = useState<{
     type: "idle" | "loading" | "success" | "error";
     message: string;
@@ -64,6 +66,7 @@ export function PartnerForm() {
         message: data.message,
       });
       form.reset();
+      setLocationResetKey((value) => value + 1);
     } catch {
       setStatus({
         type: "error",
@@ -73,8 +76,16 @@ export function PartnerForm() {
   }
 
   const legalFields = FORM_FIELDS.filter((field) => field.section === "legal");
-  const operativoFields = FORM_FIELDS.filter(
-    (field) => field.section === "operativo",
+  const profileFields = FORM_FIELDS.filter(
+    (field) =>
+      field.section === "operativo" &&
+      !["regione", "provincia", "comune", "cap"].includes(field.key),
+  );
+  const indirizzoField = profileFields.find(
+    (field) => field.key === "indirizzoOperativo",
+  );
+  const remainingProfileFields = profileFields.filter(
+    (field) => field.key !== "indirizzoOperativo",
   );
 
   return (
@@ -116,21 +127,23 @@ export function PartnerForm() {
 
       <div className="form-section form-section--operativo">
         <h3>Sede operativa e profilo commerciale</h3>
-        <div className="input-row">
-          {operativoFields.slice(0, 5).map((field) => (
-            <div className="input-group" key={field.key}>
-              <label htmlFor={field.key}>{field.label}</label>
-              <input
-                id={field.key}
-                name={field.key}
-                type={field.type ?? "text"}
-                placeholder={field.placeholder}
-                required
-              />
-            </div>
-          ))}
-        </div>
-        {operativoFields.slice(5).map((field) => (
+        {indirizzoField ? (
+          <div className="input-group">
+            <label htmlFor={indirizzoField.key}>{indirizzoField.label}</label>
+            <input
+              id={indirizzoField.key}
+              name={indirizzoField.key}
+              type="text"
+              placeholder={indirizzoField.placeholder}
+              required
+              autoComplete="street-address"
+            />
+          </div>
+        ) : null}
+
+        <LocationFields resetKey={locationResetKey} />
+
+        {remainingProfileFields.map((field) => (
           <div className="input-group" key={field.key}>
             <label htmlFor={field.key}>{field.label}</label>
             {field.type === "textarea" ? (
