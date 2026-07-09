@@ -5,20 +5,38 @@
 }
 
 :root {
-  --bg: #050b16;
-  --surface: rgba(11, 20, 36, 0.7);
-  --surface-strong: rgba(14, 28, 52, 0.95);
-  --primary: #1e6bff;
-  --accent: #25e6a0;
-  --text: #eaf4ff;
-  --muted: #a7b4c8;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
-  --shadow: 0 24px 60px rgba(3, 10, 20, 0.45);
+  /* Colori istituzionali Gruppo Iren */
+  --iren-green: #00b140;
+  --iren-blue: #0033a0;
+  --iren-yellow: #ffd100;
+  --iren-orange: #ff8200;
+  --iren-red: #da291c;
+  --iren-black: #000000;
+
+  --bg: #f4f7fb;
+  --bg-soft: #eef3f9;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --primary: var(--iren-green);
+  --primary-dark: #008f35;
+  --accent: var(--iren-blue);
+  --text: #1c2433;
+  --muted: #5a6478;
+  --border: rgba(0, 51, 160, 0.12);
+  --border-strong: rgba(0, 51, 160, 0.22);
+  --shadow: 0 16px 48px rgba(0, 51, 160, 0.08);
   --nav-height: 80px;
   --content-max: 1280px;
-  --legal-accent: #bdd7ee;
-  --operativo-accent: #f8cbad;
+  --legal-accent: #0033a0;
+  --operativo-accent: #00b140;
+  --iren-gradient: linear-gradient(
+    90deg,
+    var(--iren-yellow) 0%,
+    var(--iren-orange) 28%,
+    var(--iren-red) 52%,
+    var(--iren-blue) 76%,
+    var(--iren-green) 100%
+  );
 }
 
 html {
@@ -27,7 +45,7 @@ html {
 
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top, #0e1b33 0%, #050b16 60%);
+  background: var(--bg);
   color: var(--text);
   line-height: 1.6;
   overflow-x: hidden;
@@ -47,38 +65,40 @@ img {
   inset: 0;
   z-index: -1;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .orb {
   position: absolute;
   border-radius: 999px;
-  opacity: 0.6;
-  animation: float 12s ease-in-out infinite;
+  opacity: 0.45;
+  filter: blur(2px);
+  animation: float 14s ease-in-out infinite;
 }
 
 .orb-1 {
-  width: 420px;
-  height: 420px;
-  background: radial-gradient(circle, rgba(30, 107, 255, 0.35), transparent 70%);
-  top: -120px;
-  left: -80px;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(0, 177, 64, 0.22), transparent 70%);
+  top: -160px;
+  left: -120px;
 }
 
 .orb-2 {
   width: 520px;
   height: 520px;
-  background: radial-gradient(circle, rgba(37, 230, 160, 0.35), transparent 70%);
+  background: radial-gradient(circle, rgba(0, 51, 160, 0.16), transparent 70%);
   right: -180px;
-  top: 20%;
+  top: 18%;
   animation-delay: 2s;
 }
 
 .orb-3 {
-  width: 360px;
-  height: 360px;
-  background: radial-gradient(circle, rgba(30, 107, 255, 0.25), transparent 70%);
-  bottom: -120px;
-  left: 20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 209, 0, 0.18), transparent 70%);
+  bottom: -140px;
+  left: 18%;
   animation-delay: 4s;
 }
 
@@ -88,7 +108,7 @@ img {
     transform: translateY(0) translateX(0);
   }
   50% {
-    transform: translateY(-30px) translateX(20px);
+    transform: translateY(-24px) translateX(16px);
   }
 }
 
@@ -96,9 +116,10 @@ img {
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: blur(18px);
-  background: rgba(5, 11, 22, 0.75);
+  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.92);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 24px rgba(0, 51, 160, 0.06);
 }
 
 .nav {
@@ -115,23 +136,20 @@ img {
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.55rem;
 }
 
-.logo-mark {
-  width: 18px;
-  height: 18px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  box-shadow: 0 0 16px rgba(37, 230, 160, 0.4);
+.logo-image {
+  width: auto;
+  height: 36px;
   flex-shrink: 0;
 }
 
 .brand-title {
   font-size: 1.05rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--iren-green);
 }
 
 .nav-actions {
@@ -148,25 +166,31 @@ img {
   padding: 0.85rem 1.5rem;
   border-radius: 999px;
   font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid transparent;
   transition: transform 0.18s ease, box-shadow 0.22s ease, background 0.22s ease;
   cursor: pointer;
   font-size: 0.95rem;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: var(--iren-green);
   color: #fff;
-  box-shadow: 0 10px 30px rgba(30, 107, 255, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 177, 64, 0.28);
 }
 
 .btn-primary:hover {
+  background: var(--primary-dark);
   transform: translateY(-2px);
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text);
+  background: #fff;
+  color: var(--accent);
+  border-color: var(--border-strong);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-soft);
 }
 
 .btn-small {
@@ -179,13 +203,25 @@ img {
   margin: 0 auto;
   padding: 4.5rem 1.5rem 2.5rem;
   text-align: center;
+  position: relative;
+}
+
+.page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 1.5rem 1.5rem auto;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--iren-gradient);
+  opacity: 0.85;
 }
 
 .page-hero h1 {
   font-size: clamp(2.2rem, 3.4vw, 3rem);
   line-height: 1.18;
   max-width: 920px;
-  margin: 0 auto 1rem;
+  margin: 1.25rem auto 1rem;
+  color: var(--iren-blue);
 }
 
 .hero-subtitle {
@@ -200,18 +236,19 @@ img {
   align-items: center;
   gap: 0.6rem;
   text-transform: uppercase;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.22em;
   font-size: 0.72rem;
-  color: var(--accent);
-  margin-bottom: 1rem;
-  font-weight: 600;
+  color: var(--iren-green);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
 }
 
 .eyebrow-line::before {
   content: "";
   width: 28px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent));
+  height: 2px;
+  border-radius: 999px;
+  background: var(--iren-gradient);
 }
 
 .section {
@@ -221,7 +258,7 @@ img {
 }
 
 .section-alt {
-  background: rgba(8, 16, 30, 0.6);
+  background: var(--bg-soft);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
@@ -234,6 +271,7 @@ img {
 .section-head h2 {
   font-size: clamp(1.8rem, 3vw, 2.4rem);
   margin-bottom: 0.75rem;
+  color: var(--iren-blue);
 }
 
 .section-head p {
@@ -270,7 +308,7 @@ img {
   content: "✓";
   position: absolute;
   left: 0;
-  color: var(--accent);
+  color: var(--iren-green);
   font-weight: 700;
 }
 
@@ -283,6 +321,7 @@ img {
 .offer-card h3 {
   margin-bottom: 0.75rem;
   font-size: 1.1rem;
+  color: var(--text);
 }
 
 .offer-card p,
@@ -301,15 +340,16 @@ img {
   display: inline-flex;
   padding: 0.3rem 0.7rem;
   border-radius: 999px;
-  background: rgba(37, 230, 160, 0.15);
-  color: var(--accent);
+  background: rgba(0, 177, 64, 0.12);
+  color: var(--iren-green);
   font-size: 0.75rem;
+  font-weight: 600;
   margin-bottom: 0.75rem;
 }
 
 .offer-badge.suspended {
-  background: rgba(255, 184, 92, 0.15);
-  color: #ffb85c;
+  background: rgba(255, 130, 0, 0.12);
+  color: var(--iren-orange);
 }
 
 .commission-table {
@@ -317,6 +357,7 @@ img {
   border-collapse: collapse;
   overflow: hidden;
   border-radius: 16px;
+  background: #fff;
 }
 
 .commission-table th,
@@ -327,7 +368,8 @@ img {
 }
 
 .commission-table th {
-  background: rgba(30, 107, 255, 0.15);
+  background: rgba(0, 51, 160, 0.08);
+  color: var(--iren-blue);
   font-weight: 600;
 }
 
@@ -355,19 +397,19 @@ img {
 .form-section--legal {
   background: linear-gradient(
     135deg,
-    rgba(189, 215, 238, 0.12),
-    rgba(189, 215, 238, 0.04)
+    rgba(0, 51, 160, 0.06),
+    rgba(0, 51, 160, 0.02)
   );
-  border-color: rgba(189, 215, 238, 0.35);
+  border-color: rgba(0, 51, 160, 0.18);
 }
 
 .form-section--operativo {
   background: linear-gradient(
     135deg,
-    rgba(248, 203, 173, 0.14),
-    rgba(248, 203, 173, 0.05)
+    rgba(0, 177, 64, 0.08),
+    rgba(0, 177, 64, 0.02)
   );
-  border-color: rgba(248, 203, 173, 0.35);
+  border-color: rgba(0, 177, 64, 0.2);
 }
 
 .form-section h3 {
@@ -399,13 +441,14 @@ img {
 .input-group label {
   font-size: 0.9rem;
   font-weight: 500;
+  color: var(--text);
 }
 
 input,
 textarea,
 select {
-  background: rgba(7, 12, 22, 0.8);
-  border: 1px solid var(--border);
+  background: #fff;
+  border: 1px solid var(--border-strong);
   border-radius: 12px;
   padding: 0.75rem;
   color: var(--text);
@@ -420,8 +463,8 @@ textarea {
 
 input:focus,
 textarea:focus {
-  outline: 2px solid rgba(37, 230, 160, 0.3);
-  border-color: var(--accent);
+  outline: 2px solid rgba(0, 177, 64, 0.25);
+  border-color: var(--iren-green);
 }
 
 .hp-field {
@@ -437,11 +480,12 @@ textarea:focus {
 }
 
 .form-status.success {
-  color: var(--accent);
+  color: var(--iren-green);
+  font-weight: 500;
 }
 
 .form-status.error {
-  color: #ff8b8b;
+  color: var(--iren-red);
 }
 
 .admin-shell {
@@ -457,6 +501,10 @@ textarea:focus {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.5rem;
+}
+
+.admin-header h1 {
+  color: var(--iren-blue);
 }
 
 .admin-table-wrap {
@@ -477,12 +525,13 @@ textarea:focus {
 }
 
 .admin-table th {
-  color: var(--muted);
+  color: var(--iren-blue);
   font-weight: 600;
+  background: rgba(0, 51, 160, 0.05);
 }
 
 .admin-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 177, 64, 0.04);
 }
 
 .detail-grid {
@@ -492,7 +541,7 @@ textarea:focus {
 }
 
 .detail-item {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-soft);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1rem;
@@ -523,18 +572,25 @@ textarea:focus {
   height: 44px;
   border-radius: 999px;
   border: 1px solid var(--border-strong);
-  background: rgba(14, 28, 52, 0.78);
-  color: var(--text);
+  background: #fff;
+  color: var(--iren-blue);
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease, transform 0.35s ease;
   z-index: 120;
+  box-shadow: var(--shadow);
 }
 
 .back-to-top.show {
   opacity: 1;
   pointer-events: auto;
+}
+
+.back-to-top:hover {
+  background: var(--iren-green);
+  color: #fff;
+  border-color: var(--iren-green);
 }
 
 @media (max-width: 720px) {
@@ -545,6 +601,6 @@ textarea:focus {
   }
 
   .brand-title {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 }

@@ -2,8 +2,8 @@ import ExcelJS from "exceljs";
 import { EXCEL_HEADERS, FIELD_KEYS } from "@/lib/fields";
 import type { Submission } from "@/lib/types";
 
-const LEGAL_FILL = "FFBDD7EE";
-const OPERATIVO_FILL = "FFF8CBAD";
+const LEGAL_FILL = "FFD9E4F5";
+const OPERATIVO_FILL = "FFD9F0E3";
 
 function toSingleLine(value: string) {
   return value.replace(/\s*\r?\n\s*/g, " ").replace(/\s{2,}/g, " ").trim();

@@ -41,6 +41,9 @@ Apri [http://localhost:3000](http://localhost:3000). L'area admin è su [http://
 3. Aggiungi le variabili ambiente:
    - `ADMIN_PASSWORD`
    - `SESSION_SECRET` (stringa casuale ≥ 32 caratteri)
+   - `RESEND_API_KEY` e `RESEND_FROM` (notifica email a ogni nuova candidatura)
+   - `APP_URL` (URL pubblico del sito, per il link nell'email)
+   - `NOTIFIER_EMAIL` (opzionale, default `codifiche@gruppoevolvia.it`)
 4. Deploy. Il build esegue solo `next build`, senza dipendenze da database.
 5. (Opzionale) Configura un dominio custom nel progetto Vercel.
 

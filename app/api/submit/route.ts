@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { notifyNewSubmission } from "@/lib/notify";
 import { submissionSchema } from "@/lib/validation";
 import { createSubmission } from "@/lib/store";
 
@@ -8,6 +9,13 @@ export const maxDuration = 60;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 30;
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function getAppUrl(request: Request) {
+  if (process.env.APP_URL) {
+    return process.env.APP_URL.replace(/\/$/, "");
+  }
+  return new URL(request.url).origin;
+}
 
 function isRateLimited(ip: string) {
   const now = Date.now();
@@ -64,7 +72,13 @@ export async function POST(request: Request) {
 
     const { website: _website, ...data } = parsed.data;
 
-    await createSubmission(data);
+    const submission = await createSubmission(data);
+
+    try {
+      await notifyNewSubmission(submission, getAppUrl(request));
+    } catch (emailError) {
+      console.error("Notification email error:", emailError);
+    }
 
     return NextResponse.json({
       success: true,
