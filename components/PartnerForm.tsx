@@ -1,13 +1,37 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, type FormEvent } from "react";
 import { FORM_FIELDS } from "@/lib/fields";
+import { SUBMIT_SUCCESS_MESSAGE } from "@/lib/submit-messages";
 
 export function PartnerForm() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [status, setStatus] = useState<{
     type: "idle" | "loading" | "success" | "error";
     message: string;
   }>({ type: "idle", message: "" });
+
+  useEffect(() => {
+    if (searchParams.get("submitted") === "1") {
+      setStatus({
+        type: "success",
+        message: SUBMIT_SUCCESS_MESSAGE,
+      });
+      router.replace("/#candidatura", { scroll: false });
+      return;
+    }
+
+    const error = searchParams.get("error");
+    if (error) {
+      setStatus({
+        type: "error",
+        message: error,
+      });
+      router.replace("/#candidatura", { scroll: false });
+    }
+  }, [router, searchParams]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -20,6 +44,9 @@ export function PartnerForm() {
       const response = await fetch("/api/submit", {
         method: "POST",
         body: formData,
+        headers: {
+          Accept: "application/json",
+        },
       });
 
       const data = await response.json();
@@ -51,7 +78,12 @@ export function PartnerForm() {
   );
 
   return (
-    <form className="contact-form" onSubmit={handleSubmit}>
+    <form
+      className="contact-form"
+      action="/api/submit"
+      method="post"
+      onSubmit={handleSubmit}
+    >
       <div className="form-section form-section--legal">
         <h3>Dati legali e contatto</h3>
         <div className="input-row">

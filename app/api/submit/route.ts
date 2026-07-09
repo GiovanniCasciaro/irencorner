@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { notifyNewSubmission } from "@/lib/notify";
-import { submissionSchema } from "@/lib/validation";
 import { createSubmission } from "@/lib/store";
+import {
+  isBrowserFormSubmit,
+  SUBMIT_SUCCESS_MESSAGE,
+  submitRedirectUrl,
+} from "@/lib/submit-messages";
+import { submissionSchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -15,6 +20,29 @@ function getAppUrl(request: Request) {
     return process.env.APP_URL.replace(/\/$/, "");
   }
   return new URL(request.url).origin;
+}
+
+function respondError(request: Request, message: string, status: number) {
+  if (isBrowserFormSubmit(request)) {
+    return NextResponse.redirect(
+      submitRedirectUrl(request, { error: message }),
+      303,
+    );
+  }
+  return NextResponse.json({ error: message }, { status });
+}
+
+function respondSuccess(request: Request) {
+  if (isBrowserFormSubmit(request)) {
+    return NextResponse.redirect(
+      submitRedirectUrl(request, { submitted: "1" }),
+      303,
+    );
+  }
+  return NextResponse.json({
+    success: true,
+    message: SUBMIT_SUCCESS_MESSAGE,
+  });
 }
 
 function isRateLimited(ip: string) {
@@ -40,9 +68,10 @@ export async function POST(request: Request) {
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
     if (isRateLimited(ip)) {
-      return NextResponse.json(
-        { error: "Troppe richieste. Riprova tra un'ora." },
-        { status: 429 },
+      return respondError(
+        request,
+        "Troppe richieste. Riprova tra qualche minuto.",
+        429,
       );
     }
 
@@ -67,7 +96,7 @@ export async function POST(request: Request) {
     const parsed = submissionSchema.safeParse(payload);
     if (!parsed.success) {
       const firstError = parsed.error.issues[0]?.message ?? "Dati non validi.";
-      return NextResponse.json({ error: firstError }, { status: 400 });
+      return respondError(request, firstError, 400);
     }
 
     const { website: _website, ...data } = parsed.data;
@@ -80,11 +109,7 @@ export async function POST(request: Request) {
       console.error("Notification email error:", emailError);
     }
 
-    return NextResponse.json({
-      success: true,
-      message:
-        "Richiesta inviata con successo. Dopo l'approvazione di IREN riceverai il contratto via email per la firma digitale.",
-    });
+    return respondSuccess(request);
   } catch (error) {
     console.error("Submit error:", error);
 
@@ -93,12 +118,10 @@ export async function POST(request: Request) {
         error.message.includes("BLOB_READ_WRITE_TOKEN") ||
         error.message.includes("Storage non configurato")
       ) {
-        return NextResponse.json(
-          {
-            error:
-              "Servizio temporaneamente non disponibile. Contatta l'amministratore del sito.",
-          },
-          { status: 503 },
+        return respondError(
+          request,
+          "Servizio temporaneamente non disponibile. Contatta l'amministratore del sito.",
+          503,
         );
       }
 
@@ -106,19 +129,18 @@ export async function POST(request: Request) {
         error.message.includes("Vercel Blob") ||
         error.message.includes("Impossibile salvare la candidatura su Vercel Blob")
       ) {
-        return NextResponse.json(
-          {
-            error:
-              "Impossibile salvare la candidatura. Riprova tra qualche minuto.",
-          },
-          { status: 503 },
+        return respondError(
+          request,
+          "Impossibile salvare la candidatura. Riprova tra qualche minuto.",
+          503,
         );
       }
     }
 
-    return NextResponse.json(
-      { error: "Errore durante l'invio. Riprova più tardi." },
-      { status: 500 },
+    return respondError(
+      request,
+      "Errore durante l'invio. Riprova più tardi.",
+      500,
     );
   }
 }

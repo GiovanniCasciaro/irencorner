@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { ContentSections } from "@/components/ContentSections";
 import { PartnerForm } from "@/components/PartnerForm";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -30,7 +31,9 @@ export default function HomePage() {
               riceverai il contratto via email.
             </p>
           </div>
-          <PartnerForm />
+          <Suspense fallback={<p className="form-status">Caricamento form...</p>}>
+            <PartnerForm />
+          </Suspense>
         </section>
       </main>
     </>

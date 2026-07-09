@@ -32,11 +32,8 @@ export async function notifyNewSubmission(
 ) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    if (process.env.VERCEL === "1") {
-      throw new Error("RESEND_API_KEY non configurato.");
-    }
     console.warn(
-      "RESEND_API_KEY assente: notifica email saltata in ambiente locale.",
+      "RESEND_API_KEY assente: notifica email non inviata.",
     );
     return;
   }
