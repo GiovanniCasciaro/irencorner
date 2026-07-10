@@ -5,19 +5,19 @@ export const PREVIEW_HEADLINE =
   "Energia, processi digitali e supporto dedicato per la tua agenzia";
 
 export const PREVIEW_SUBLINE =
-  "Offerte competitive, compensi fino a 115€ a contratto e operatività immediata con IrenForce.";
+  "Catalogo Luce, Gas, Fibra e Tech, compensi competitivi e operatività immediata con IrenForce.";
 
 export const PREVIEW_TILES = [
   {
-    label: "Prezzo fisso",
-    title: "Sottocasa Special",
-    detail: "Luce 0,10 €/kWh · Gas 0,44 €/Smc",
+    label: "Catalogo",
+    title: "Luce & Gas",
+    detail: "offerte low cost sempre a portafoglio",
     accent: "#0033a0",
   },
   {
     label: "Compensi",
-    title: "Fino a 115€",
-    detail: "per ogni contratto attivo 9 mesi",
+    title: "Crescono con te",
+    detail: "bonus sui contratti attivi nel tempo",
     accent: "#00b140",
   },
   {
@@ -27,9 +27,9 @@ export const PREVIEW_TILES = [
     accent: "#ff8200",
   },
   {
-    label: "TLC",
-    title: "Fibra 18,99 €",
-    detail: "anche offerte business e bundle",
+    label: "Tech",
+    title: "Fibra & bundle",
+    detail: "domestico, business e pertinenze",
     accent: "#da291c",
   },
 ] as const;

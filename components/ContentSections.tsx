@@ -41,94 +41,39 @@ export function ContentSections() {
       <section className="section section-alt" id="offerte-attive">
         <div className="section-head">
           <p className="eyebrow-line">Tariffe</p>
-          <h2>Offerte Attive</h2>
+          <h2>Un catalogo completo Luce, Gas, Fibra e prodotti Tech</h2>
         </div>
-        <div className="offers-grid">
-          <article className="offer-card">
-            <span className="offer-badge">Prezzo fisso</span>
-            <h3>Sottocasa Special — RID o Bollettino</h3>
-            <ul>
-              <li>Luce: 0,10 €/kWh (perdite incluse)</li>
-              <li>Gas: 0,44 €/Smc</li>
-            </ul>
-          </article>
-          
-          <article className="offer-card">
-            <span className="offer-badge">Prezzo fisso</span>
-            <h3>Tua Azienda — RID o Bollettino</h3>
-            <ul>
-              <li>Luce: 0,15 €/kWh (perdite incluse)</li>
-              <li>Gas: 0,56 €/Smc</li>
-              <li>Piano compensi ricorrente basato sui consumi in fornitura</li>
-            </ul>
-          </article>
-          <article className="offer-card">
-            <span className="offer-badge">Vendita Bundle</span>
-            <h3>Stay Tech</h3>
-            <p>
-              Con televisore in regalo o acquisto e-bike rateizzato in bolletta
-               con offerta prezzo fisso di 0,13 €/kWh
-            </p>
-          </article>
-          <article className="offer-card">
-            <span className="offer-badge">Pertinenze</span>
-            <h3>Offerta &quot;10 per due&quot;</h3>
-            <p>Costo di commercializzazione: 55 € e PUN+0,02 €/kWh</p>
-          </article>
-          <article className="offer-card">
-            <span className="offer-badge">TLC</span>
-            <h3>Fibra a 18,99 €/mese</h3>
-            <p>
-              Disponibile anche l&apos;offerta Iren Stay (prezzo fisso + Fibra)
-            </p>
-          </article>
+        <div className="content-card">
+          <p>
+            Offerte low cost sempre a portafoglio. Prezzi tra i più competitivi
+            del mercato, aggiornati costantemente e garantiti nel tempo, così hai
+            sempre l&apos;offerta giusta per chiudere il cliente.
+          </p>
+          <p style={{ marginTop: "1rem" }}>
+            Domestico e business a prezzo bloccato, bundle con fibra e prodotti
+            tech, soluzioni per pertinenze.
+          </p>
+          <p className="commission-note" style={{ marginTop: "1.25rem" }}>
+            Il listino completo e aggiornato te lo illustriamo direttamente al
+            telefono, insieme alle condizioni riservate ai partner.
+          </p>
         </div>
-        <p className="commission-note" style={{ marginTop: "1.5rem" }}>
-          Tutte le offerte sono attivabili anche con Bollettino, eccetto Fibra e
-          Iren Stay.
-        </p>
       </section>
 
       <section className="section" id="provvigioni">
         <div className="section-head">
           <p className="eyebrow-line">Compensi</p>
-          <h2>Provvigioni</h2>
-          <p>Soglie di pagamento per contratto inserito:</p>
+          <h2>Un piano compensi tra i più competitivi del mercato</h2>
         </div>
         <div className="content-card">
-          <table className="commission-table">
-            <thead>
-              <tr>
-                <th>Contratti mensili</th>
-                <th>Compenso per contratto</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Da 1 a 5 contratti</td>
-                <td>60€ cad.</td>
-              </tr>
-              <tr>
-                <td>Da 6 a 10 contratti</td>
-                <td>70€ cad.</td>
-              </tr>
-              <tr>
-                <td>Da 11 a 50 contratti</td>
-                <td>80€ cad.</td>
-              </tr>
-              <tr>
-                <td>Da 51 a 99 contratti</td>
-                <td>90€ cad.</td>
-              </tr>
-              <tr>
-                <td>Oltre 99 contratti</td>
-                <td>100€ cad.</td>
-              </tr>
-            </tbody>
-          </table>
-          <p className="commission-note" style={{ fontWeight: "bold" }}>
-            A tutti i compensi si aggiunge un bonus di 15€ per ogni contratto
-            che rimane attivo per 9 mesi, per un totale di 115€ a contratto.
+          <p>
+            Il nostro sistema di compensi cresce con te: più produci, più
+            guadagni, con un bonus dedicato ai contratti che restano attivi nel
+            tempo.
+          </p>
+          <p className="commission-note" style={{ marginTop: "1.25rem" }}>
+            Ti presentiamo tutte le condizioni economiche nel dettaglio con una
+            telefonata, non appena mostri interesse al mandato.
           </p>
         </div>
       </section>
