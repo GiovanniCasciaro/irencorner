@@ -57,15 +57,8 @@ body:has(.preview-shell) {
 }
 
 .preview-collage__brand img {
-  width: 88px;
-  height: auto;
-}
-
-.preview-collage__brand span {
-  font-size: 1.65rem;
-  font-weight: 700;
-  color: #0033a0;
-  letter-spacing: -0.02em;
+  width: auto;
+  height: 64px;
 }
 
 .preview-collage__eyebrow {

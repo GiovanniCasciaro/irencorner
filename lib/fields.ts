@@ -36,7 +36,7 @@ export const FORM_FIELDS: Array<{
   key: FieldKey;
   label: string;
   section: "legal" | "operativo";
-  type?: "text" | "email" | "textarea";
+  type?: "text" | "email" | "textarea" | "yesno";
   placeholder?: string;
 }> = [
   {
@@ -110,8 +110,7 @@ export const FORM_FIELDS: Array<{
     key: "esperienzaEnergetico",
     label: EXCEL_HEADERS[11],
     section: "operativo",
-    type: "textarea",
-    placeholder: "Descrivi la tua esperienza nel settore energetico",
+    type: "yesno",
   },
   {
     key: "altriCompetitor",

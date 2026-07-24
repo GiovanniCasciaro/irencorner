@@ -145,23 +145,50 @@ export function PartnerForm() {
 
         {remainingProfileFields.map((field) => (
           <div className="input-group" key={field.key}>
-            <label htmlFor={field.key}>{field.label}</label>
-            {field.type === "textarea" ? (
-              <textarea
-                id={field.key}
-                name={field.key}
-                placeholder={field.placeholder}
-                rows={4}
-                required
-              />
+            {field.type === "yesno" ? (
+              <>
+                <span className="field-legend" id={`${field.key}-label`}>
+                  {field.label}
+                </span>
+                <div
+                  className="choice-row"
+                  role="radiogroup"
+                  aria-labelledby={`${field.key}-label`}
+                >
+                  {(["Sì", "No"] as const).map((option) => (
+                    <label className="choice-option" key={option}>
+                      <input
+                        type="radio"
+                        name={field.key}
+                        value={option}
+                        required
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              </>
             ) : (
-              <input
-                id={field.key}
-                name={field.key}
-                type={field.type ?? "text"}
-                placeholder={field.placeholder}
-                required
-              />
+              <>
+                <label htmlFor={field.key}>{field.label}</label>
+                {field.type === "textarea" ? (
+                  <textarea
+                    id={field.key}
+                    name={field.key}
+                    placeholder={field.placeholder}
+                    rows={4}
+                    required
+                  />
+                ) : (
+                  <input
+                    id={field.key}
+                    name={field.key}
+                    type={field.type ?? "text"}
+                    placeholder={field.placeholder}
+                    required
+                  />
+                )}
+              </>
             )}
           </div>
         ))}

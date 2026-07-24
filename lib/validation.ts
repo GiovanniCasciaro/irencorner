@@ -17,9 +17,9 @@ export const submissionSchema = z.object({
     .transform((value) => value.toUpperCase()),
   regione: z.string().min(2, "Inserisci la regione."),
   tipologiaAttivita: z.string().min(2, "Inserisci la tipologia di attività."),
-  esperienzaEnergetico: z
-    .string()
-    .min(5, "Descrivi la tua esperienza nel settore energetico."),
+  esperienzaEnergetico: z.enum(["Sì", "No"], {
+    message: "Seleziona Sì o No per l'esperienza nel settore energetico.",
+  }),
   altriCompetitor: z.string().min(2, "Indica gli altri competitor presenti."),
   website: z.string().max(0, "Richiesta non valida."),
 });

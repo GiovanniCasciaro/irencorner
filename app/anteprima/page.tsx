@@ -21,13 +21,12 @@ export default function AnteprimaPage() {
         <div className="preview-collage__body">
           <div className="preview-collage__brand">
             <Image
-              src="/favicon.ico"
+              src="/logo.jpg"
               alt=""
-              width={88}
-              height={30}
+              width={220}
+              height={124}
               aria-hidden="true"
             />
-            <span>Corner</span>
           </div>
 
           <p className="preview-collage__eyebrow">Collabora con noi</p>
