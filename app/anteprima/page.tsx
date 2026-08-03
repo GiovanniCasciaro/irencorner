@@ -23,8 +23,8 @@ export default function AnteprimaPage() {
             <Image
               src="/logo.jpg"
               alt=""
-              width={220}
-              height={124}
+              width={360}
+              height={86}
               aria-hidden="true"
             />
           </div>

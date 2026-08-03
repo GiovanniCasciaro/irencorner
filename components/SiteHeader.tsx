@@ -5,12 +5,12 @@ export function SiteHeader() {
   return (
     <header className="site-header" id="top">
       <nav className="nav" aria-label="Navigazione principale">
-        <Link className="logo" href="/" aria-label="Iren Canale Corner - Home">
+        <Link className="logo" href="/" aria-label="Iren eNOVA Italia - Home">
           <Image
             src="/logo.jpg"
-            alt="Iren Canale Corner — eNOVA Italia"
-            width={220}
-            height={124}
+            alt="Iren — eNOVA Italia"
+            width={360}
+            height={86}
             className="logo-image"
             priority
           />
