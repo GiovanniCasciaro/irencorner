@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getSubmissionExcelDownloadUrl } from "@/lib/submission";
 
 type AdminSection = "unread" | "read" | "trash";
 
-type SubmissionRow = {
+export type SubmissionRow = {
   id: string;
   createdAt: string;
   email: string;
@@ -20,19 +20,39 @@ type SubmissionRow = {
   deletedAt: string | null;
 };
 
-async function runAction(id: string, action: "trash" | "restore" | "purge") {
+type ActionResult = {
+  submission?: SubmissionRow & Record<string, unknown>;
+  ok?: boolean;
+  error?: string;
+};
+
+async function runAction(
+  id: string,
+  action: "trash" | "restore" | "purge",
+): Promise<ActionResult> {
   const response = await fetch(`/api/admin/submissions/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action }),
   });
 
+  const data = (await response.json().catch(() => null)) as ActionResult | null;
   if (!response.ok) {
-    const data = (await response.json().catch(() => null)) as {
-      error?: string;
-    } | null;
     throw new Error(data?.error ?? "Operazione non riuscita.");
   }
+  return data ?? {};
+}
+
+function isUnread(row: SubmissionRow) {
+  return !row.deletedAt && !row.readAt;
+}
+
+function isRead(row: SubmissionRow) {
+  return !row.deletedAt && Boolean(row.readAt);
+}
+
+function isTrash(row: SubmissionRow) {
+  return Boolean(row.deletedAt);
 }
 
 export function SubmissionTable({
@@ -42,25 +62,28 @@ export function SubmissionTable({
 }) {
   const router = useRouter();
   const [section, setSection] = useState<AdminSection>("unread");
+  const [rows, setRows] = useState<SubmissionRow[]>(submissions);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  const counts = useMemo(() => {
-    const unread = submissions.filter((s) => !s.deletedAt && !s.readAt).length;
-    const read = submissions.filter((s) => !s.deletedAt && s.readAt).length;
-    const trash = submissions.filter((s) => Boolean(s.deletedAt)).length;
-    return { unread, read, trash };
+  useEffect(() => {
+    setRows(submissions);
   }, [submissions]);
 
+  const counts = useMemo(
+    () => ({
+      unread: rows.filter(isUnread).length,
+      read: rows.filter(isRead).length,
+      trash: rows.filter(isTrash).length,
+    }),
+    [rows],
+  );
+
   const visible = useMemo(() => {
-    if (section === "unread") {
-      return submissions.filter((s) => !s.deletedAt && !s.readAt);
-    }
-    if (section === "read") {
-      return submissions.filter((s) => !s.deletedAt && s.readAt);
-    }
-    return submissions.filter((s) => Boolean(s.deletedAt));
-  }, [section, submissions]);
+    if (section === "unread") return rows.filter(isUnread);
+    if (section === "read") return rows.filter(isRead);
+    return rows.filter(isTrash);
+  }, [section, rows]);
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -80,7 +103,45 @@ export function SubmissionTable({
     setBusyId(id);
     setError("");
     try {
-      await runAction(id, action);
+      const result = await runAction(id, action);
+
+      if (action === "purge") {
+        setRows((current) => current.filter((row) => row.id !== id));
+        setSection("trash");
+      } else if (result.submission) {
+        const updated: SubmissionRow = {
+          id: result.submission.id,
+          createdAt: String(result.submission.createdAt),
+          email: String(result.submission.email),
+          ragioneSociale: String(result.submission.ragioneSociale),
+          partitaIva: String(result.submission.partitaIva),
+          provincia: String(result.submission.provincia),
+          comune: String(result.submission.comune),
+          excelUrl:
+            typeof result.submission.excelUrl === "string"
+              ? result.submission.excelUrl
+              : null,
+          readAt:
+            typeof result.submission.readAt === "string"
+              ? result.submission.readAt
+              : null,
+          deletedAt:
+            typeof result.submission.deletedAt === "string"
+              ? result.submission.deletedAt
+              : null,
+        };
+
+        setRows((current) =>
+          current.map((row) => (row.id === id ? updated : row)),
+        );
+
+        if (action === "trash") {
+          setSection("trash");
+        } else if (action === "restore") {
+          setSection(updated.readAt ? "read" : "unread");
+        }
+      }
+
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Operazione non riuscita.");
@@ -174,16 +235,14 @@ export function SubmissionTable({
                 <tr
                   key={submission.id}
                   className={
-                    !submission.readAt && !submission.deletedAt
-                      ? "admin-row--unread"
-                      : undefined
+                    isUnread(submission) ? "admin-row--unread" : undefined
                   }
                 >
                   <td>
                     {new Date(submission.createdAt).toLocaleString("it-IT")}
                   </td>
                   <td>
-                    {!submission.readAt && !submission.deletedAt ? (
+                    {isUnread(submission) ? (
                       <strong>{submission.ragioneSociale}</strong>
                     ) : (
                       submission.ragioneSociale

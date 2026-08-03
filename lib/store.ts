@@ -49,6 +49,7 @@ async function persistSubmissionRecord(submission: Submission) {
       submissionDataPath(submission.id),
       payload,
       "application/json; charset=utf-8",
+      { cacheControlMaxAge: 60 },
     );
     return;
   }

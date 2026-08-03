@@ -614,6 +614,17 @@ input:disabled {
   margin-top: 1rem;
 }
 
+.admin-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(0, 177, 64, 0.12);
+  color: var(--iren-green);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
 .admin-table-wrap {
   overflow-x: auto;
 }

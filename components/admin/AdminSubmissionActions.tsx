@@ -6,9 +6,11 @@ import { useState } from "react";
 export function AdminSubmissionActions({
   id,
   inTrash,
+  readAt,
 }: {
   id: string;
   inTrash: boolean;
+  readAt: string | null;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -37,7 +39,12 @@ export function AdminSubmissionActions({
 
       if (action === "purge") {
         router.push("/admin");
+        router.refresh();
+        return;
       }
+
+      // Force a fresh list so tabs reflect the new status immediately.
+      router.push("/admin");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Operazione non riuscita.");
@@ -84,6 +91,9 @@ export function AdminSubmissionActions({
           Sposta nel cestino
         </button>
       )}
+      {!inTrash && readAt ? (
+        <span className="admin-status-pill">Letta</span>
+      ) : null}
       {error ? <p className="form-status error">{error}</p> : null}
     </div>
   );

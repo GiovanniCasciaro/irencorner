@@ -1,5 +1,7 @@
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
+import { AdminListRefresh } from "@/components/admin/AdminListRefresh";
 import { SubmissionTable } from "@/components/admin/SubmissionTable";
 import { listSubmissions } from "@/lib/store";
 
@@ -8,6 +10,7 @@ export default async function AdminPage() {
 
   return (
     <main className="admin-shell">
+      <AdminListRefresh />
       <SubmissionTable
         submissions={submissions.map((submission) => ({
           id: submission.id,

@@ -40,12 +40,15 @@ export async function writeBlob(
   pathname: string,
   body: string | Buffer,
   contentType: string,
+  options?: { cacheControlMaxAge?: number },
 ) {
   return put(pathname, body, {
     access: BLOB_ACCESS,
     contentType,
     addRandomSuffix: false,
     allowOverwrite: true,
+    // data.json is mutated often (read/trash); keep edge cache short
+    cacheControlMaxAge: options?.cacheControlMaxAge ?? 60,
   });
 }
 

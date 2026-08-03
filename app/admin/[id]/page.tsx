@@ -33,7 +33,7 @@ export default async function AdminDetailPage({
       <div className="admin-card">
         <div className="admin-header">
           <div>
-            <Link href="/admin" className="btn btn-ghost btn-small">
+            <Link href="/admin" className="btn btn-ghost btn-small" prefetch={false}>
               ← Torna alla lista
             </Link>
             <h1 style={{ marginTop: "1rem" }}>{submission.ragioneSociale}</h1>
@@ -59,6 +59,7 @@ export default async function AdminDetailPage({
               <AdminSubmissionActions
                 id={submission.id}
                 inTrash={Boolean(submission.deletedAt)}
+                readAt={submission.readAt ?? null}
               />
             </div>
           </div>
