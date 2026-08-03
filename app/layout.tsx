@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { BackToTop } from "@/components/BackToTop";
+import { CookieConsent } from "@/components/CookieConsent";
 import "@/styles/site.css";
 
 const inter = Inter({
@@ -53,6 +54,7 @@ export default function RootLayout({
           <span className="orb orb-3" />
         </div>
         {children}
+        <CookieConsent />
         <BackToTop />
       </body>
     </html>

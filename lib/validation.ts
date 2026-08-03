@@ -22,6 +22,10 @@ export const submissionSchema = z.object({
   }),
   altriCompetitor: z.string().min(2, "Indica gli altri competitor presenti."),
   website: z.string().max(0, "Richiesta non valida."),
+  privacyConsent: z.literal(true, {
+    message: "Per inviare la candidatura devi accettare la Privacy Policy.",
+  }),
+  marketingConsent: z.boolean().default(false),
 });
 
 export type SubmissionInput = z.infer<typeof submissionSchema>;

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { ContentSections } from "@/components/ContentSections";
 import { PartnerForm } from "@/components/PartnerForm";
+import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 
 export default function HomePage() {
@@ -36,6 +37,7 @@ export default function HomePage() {
           </Suspense>
         </section>
       </main>
+      <SiteFooter />
     </>
   );
 }

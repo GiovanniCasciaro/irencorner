@@ -199,6 +199,37 @@ export function PartnerForm() {
         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
+      <div className="form-section form-section--consents">
+        <h3>Consensi privacy</h3>
+        <label className="consent-item">
+          <input type="checkbox" name="privacyConsent" value="on" required />
+          <span>
+            Dichiaro di aver letto l&apos;
+            <a href="/privacy" target="_blank" rel="noreferrer">
+              Privacy Policy
+            </a>{" "}
+            e acconsento al trattamento dei dati personali per la gestione della
+            candidatura partner. <em>(obbligatorio)</em>
+          </span>
+        </label>
+        <label className="consent-item">
+          <input type="checkbox" name="marketingConsent" value="on" />
+          <span>
+            Acconsento a ricevere comunicazioni informative e commerciali
+            relative a offerte e opportunità del programma Iren Corner.{" "}
+            <em>(facoltativo)</em>
+          </span>
+        </label>
+        <p className="consent-note">
+          Puoi revocare i consensi in qualsiasi momento scrivendo all&apos;indirizzo
+          privacy indicato nella Privacy Policy. Maggiori dettagli anche nella{" "}
+          <a href="/cookie" target="_blank" rel="noreferrer">
+            Cookie Policy
+          </a>
+          .
+        </p>
+      </div>
+
       <button
         className="btn btn-primary"
         type="submit"

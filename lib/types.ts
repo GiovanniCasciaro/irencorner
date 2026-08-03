@@ -7,4 +7,6 @@ export type Submission = SubmissionData & {
   createdAt: string;
   excelUrl: string | null;
   excelFileName: string | null;
+  privacyConsentAt?: string;
+  marketingConsent?: boolean;
 };

@@ -74,6 +74,30 @@ export default async function AdminDetailPage({
         </div>
 
         <div className="form-section">
+          <h3>Consensi GDPR</h3>
+          <div className="detail-grid">
+            <div className="detail-item">
+              <span>Privacy Policy accettata</span>
+              <strong>
+                {submission.privacyConsentAt
+                  ? new Date(submission.privacyConsentAt).toLocaleString("it-IT")
+                  : "Non registrato (candidatura precedente)"}
+              </strong>
+            </div>
+            <div className="detail-item">
+              <span>Consenso comunicazioni commerciali</span>
+              <strong>
+                {submission.marketingConsent === true
+                  ? "Sì"
+                  : submission.marketingConsent === false
+                    ? "No"
+                    : "Non registrato"}
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-section">
           <h3>File Excel</h3>
           <p className="hero-subtitle" style={{ marginBottom: "1rem" }}>
             Excel personalizzato con i dati di questa candidatura.

@@ -84,6 +84,8 @@ export async function POST(request: Request) {
       esperienzaEnergetico: String(formData.get("esperienzaEnergetico") ?? ""),
       altriCompetitor: String(formData.get("altriCompetitor") ?? ""),
       website: String(formData.get("website") ?? ""),
+      privacyConsent: formData.get("privacyConsent") === "on",
+      marketingConsent: formData.get("marketingConsent") === "on",
     };
 
     const parsed = submissionSchema.safeParse(payload);
@@ -92,9 +94,25 @@ export async function POST(request: Request) {
       return respondError(request, firstError, 400);
     }
 
-    const { website: _website, ...data } = parsed.data;
+    const {
+      website: _website,
+      privacyConsent,
+      marketingConsent,
+      ...data
+    } = parsed.data;
 
-    const submission = await createSubmission(data);
+    if (!privacyConsent) {
+      return respondError(
+        request,
+        "Per inviare la candidatura devi accettare la Privacy Policy.",
+        400,
+      );
+    }
+
+    const submission = await createSubmission(data, {
+      privacyConsentAt: new Date().toISOString(),
+      marketingConsent,
+    });
 
     try {
       await notifyNewSubmission(submission, request);

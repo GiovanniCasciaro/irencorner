@@ -75,6 +75,10 @@ async function saveLocally(
 
 export async function createSubmission(
   input: SubmissionData,
+  consents?: {
+    privacyConsentAt?: string;
+    marketingConsent?: boolean;
+  },
 ): Promise<Submission> {
   assertStorageAvailable();
 
@@ -85,6 +89,8 @@ export async function createSubmission(
     createdAt: new Date().toISOString(),
     excelUrl: null,
     excelFileName: null,
+    privacyConsentAt: consents?.privacyConsentAt,
+    marketingConsent: consents?.marketingConsent ?? false,
   };
 
   const fileName = buildExcelFileName(submission);
