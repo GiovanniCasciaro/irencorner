@@ -1,4 +1,4 @@
-import { get, list, put } from "@vercel/blob";
+import { del, get, list, put } from "@vercel/blob";
 
 export const BLOB_ACCESS = "private" as const;
 
@@ -8,6 +8,10 @@ export function submissionDataPath(id: string) {
 
 export function submissionExcelPath(id: string, fileName: string) {
   return `submissions/${id}/${fileName}`;
+}
+
+export function submissionPrefix(id: string) {
+  return `submissions/${id}/`;
 }
 
 async function streamToBuffer(stream: ReadableStream<Uint8Array>) {
@@ -48,4 +52,12 @@ export async function writeBlob(
 export async function listSubmissionDataBlobs() {
   const { blobs } = await list({ prefix: "submissions/" });
   return blobs.filter((blob) => blob.pathname.endsWith("/data.json"));
+}
+
+export async function deleteSubmissionBlobs(id: string) {
+  const { blobs } = await list({ prefix: submissionPrefix(id) });
+  if (blobs.length === 0) {
+    return;
+  }
+  await del(blobs.map((blob) => blob.url));
 }

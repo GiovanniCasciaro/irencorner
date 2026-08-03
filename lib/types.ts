@@ -9,4 +9,8 @@ export type Submission = SubmissionData & {
   excelFileName: string | null;
   privacyConsentAt?: string;
   marketingConsent?: boolean;
+  /** ISO date when an admin opened the detail; null/undefined = da leggere */
+  readAt?: string | null;
+  /** ISO date when moved to trash; null/undefined = attiva */
+  deletedAt?: string | null;
 };

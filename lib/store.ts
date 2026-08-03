@@ -1,7 +1,8 @@
-import { mkdir, writeFile, readFile, readdir } from "fs/promises";
+import { mkdir, writeFile, readFile, readdir, rm } from "fs/promises";
 import path from "path";
 import { assertStorageAvailable, hasBlobStorage } from "@/lib/env";
 import {
+  deleteSubmissionBlobs,
   listSubmissionDataBlobs,
   readBlobText,
   submissionDataPath,
@@ -34,8 +35,26 @@ function adminExcelUrl(id: string) {
 function normalizeSubmission(submission: Submission): Submission {
   return {
     ...submission,
+    readAt: submission.readAt ?? null,
+    deletedAt: submission.deletedAt ?? null,
     excelUrl: adminExcelUrl(submission.id),
   };
+}
+
+async function persistSubmissionRecord(submission: Submission) {
+  const payload = JSON.stringify(submission);
+
+  if (hasBlobStorage()) {
+    await writeBlob(
+      submissionDataPath(submission.id),
+      payload,
+      "application/json; charset=utf-8",
+    );
+    return;
+  }
+
+  await mkdir(localDir(submission.id), { recursive: true });
+  await writeFile(localDataPath(submission.id), JSON.stringify(submission, null, 2));
 }
 
 async function saveToBlob(submission: Submission, excelBuffer: Buffer) {
@@ -51,12 +70,7 @@ async function saveToBlob(submission: Submission, excelBuffer: Buffer) {
   );
 
   submission.excelUrl = adminExcelUrl(id);
-
-  await writeBlob(
-    submissionDataPath(id),
-    JSON.stringify(submission),
-    "application/json; charset=utf-8",
-  );
+  await persistSubmissionRecord(submission);
 }
 
 async function saveLocally(
@@ -91,6 +105,8 @@ export async function createSubmission(
     excelFileName: null,
     privacyConsentAt: consents?.privacyConsentAt,
     marketingConsent: consents?.marketingConsent ?? false,
+    readAt: null,
+    deletedAt: null,
   };
 
   const fileName = buildExcelFileName(submission);
@@ -133,7 +149,8 @@ export async function listSubmissions(): Promise<Submission[]> {
         }
       }),
     );
-    submissions = results.filter((item): item is Submission => item !== null)
+    submissions = results
+      .filter((item): item is Submission => item !== null)
       .map(normalizeSubmission);
   } else {
     try {
@@ -150,17 +167,15 @@ export async function listSubmissions(): Promise<Submission[]> {
             }
           }),
       );
-      submissions = results.filter(
-        (item): item is Submission => item !== null,
-      ).map(normalizeSubmission);
+      submissions = results
+        .filter((item): item is Submission => item !== null)
+        .map(normalizeSubmission);
     } catch {
       submissions = [];
     }
   }
 
-  return submissions.sort((a, b) =>
-    b.createdAt.localeCompare(a.createdAt),
-  );
+  return submissions.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 export async function getSubmission(id: string): Promise<Submission | null> {
@@ -183,6 +198,60 @@ export async function getSubmission(id: string): Promise<Submission | null> {
   }
 
   return submission ? normalizeSubmission(submission) : null;
+}
+
+export async function markSubmissionRead(id: string): Promise<Submission | null> {
+  const submission = await getSubmission(id);
+  if (!submission || submission.deletedAt) {
+    return submission;
+  }
+
+  if (submission.readAt) {
+    return submission;
+  }
+
+  submission.readAt = new Date().toISOString();
+  await persistSubmissionRecord(submission);
+  return normalizeSubmission(submission);
+}
+
+export async function softDeleteSubmission(
+  id: string,
+): Promise<Submission | null> {
+  const submission = await getSubmission(id);
+  if (!submission) {
+    return null;
+  }
+
+  submission.deletedAt = new Date().toISOString();
+  await persistSubmissionRecord(submission);
+  return normalizeSubmission(submission);
+}
+
+export async function restoreSubmission(id: string): Promise<Submission | null> {
+  const submission = await getSubmission(id);
+  if (!submission) {
+    return null;
+  }
+
+  submission.deletedAt = null;
+  await persistSubmissionRecord(submission);
+  return normalizeSubmission(submission);
+}
+
+export async function permanentlyDeleteSubmission(id: string): Promise<boolean> {
+  const submission = await getSubmission(id);
+  if (!submission) {
+    return false;
+  }
+
+  if (hasBlobStorage()) {
+    await deleteSubmissionBlobs(id);
+  } else {
+    await rm(localDir(id), { recursive: true, force: true });
+  }
+
+  return true;
 }
 
 export async function getSubmissionExcel(

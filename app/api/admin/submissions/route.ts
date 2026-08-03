@@ -18,6 +18,8 @@ export async function GET() {
       partitaIva: submission.partitaIva,
       provincia: submission.provincia,
       comune: submission.comune,
+      readAt: submission.readAt ?? null,
+      deletedAt: submission.deletedAt ?? null,
     })),
   });
 }

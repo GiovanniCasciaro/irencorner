@@ -2,9 +2,10 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AdminSubmissionActions } from "@/components/admin/AdminSubmissionActions";
 import { FORM_FIELDS } from "@/lib/fields";
 import { getSubmissionExcelDownloadUrl } from "@/lib/submission";
-import { getSubmission } from "@/lib/store";
+import { getSubmission, markSubmissionRead } from "@/lib/store";
 
 export default async function AdminDetailPage({
   params,
@@ -12,10 +13,14 @@ export default async function AdminDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const submission = await getSubmission(id);
+  let submission = await getSubmission(id);
 
   if (!submission) {
     notFound();
+  }
+
+  if (!submission.deletedAt && !submission.readAt) {
+    submission = (await markSubmissionRead(id)) ?? submission;
   }
 
   const legalFields = FORM_FIELDS.filter((field) => field.section === "legal");
@@ -38,18 +43,31 @@ export default async function AdminDetailPage({
                 dateStyle: "full",
                 timeStyle: "short",
               })}
+              {submission.deletedAt
+                ? " · Nel cestino"
+                : submission.readAt
+                  ? " · Letta"
+                  : " · Da leggere"}
             </p>
-            <a
-              className="btn btn-primary btn-small"
-              href={getSubmissionExcelDownloadUrl(submission)}
-              style={{ marginTop: "1rem" }}
-            >
-              Scarica Excel cliente
-            </a>
+            <div className="admin-detail-toolbar">
+              <a
+                className="btn btn-primary btn-small"
+                href={getSubmissionExcelDownloadUrl(submission)}
+              >
+                Scarica Excel cliente
+              </a>
+              <AdminSubmissionActions
+                id={submission.id}
+                inTrash={Boolean(submission.deletedAt)}
+              />
+            </div>
           </div>
         </div>
 
-        <div className="form-section form-section--legal" style={{ marginTop: "1.5rem" }}>
+        <div
+          className="form-section form-section--legal"
+          style={{ marginTop: "1.5rem" }}
+        >
           <h3>Dati legali e contatto</h3>
           <div className="detail-grid">
             {legalFields.map((field) => (
@@ -80,7 +98,9 @@ export default async function AdminDetailPage({
               <span>Privacy Policy accettata</span>
               <strong>
                 {submission.privacyConsentAt
-                  ? new Date(submission.privacyConsentAt).toLocaleString("it-IT")
+                  ? new Date(submission.privacyConsentAt).toLocaleString(
+                      "it-IT",
+                    )
                   : "Non registrato (candidatura precedente)"}
               </strong>
             </div>

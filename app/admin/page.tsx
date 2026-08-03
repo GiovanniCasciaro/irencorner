@@ -18,6 +18,8 @@ export default async function AdminPage() {
           provincia: submission.provincia,
           comune: submission.comune,
           excelUrl: submission.excelUrl,
+          readAt: submission.readAt ?? null,
+          deletedAt: submission.deletedAt ?? null,
         }))}
       />
     </main>
