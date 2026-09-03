@@ -11,7 +11,7 @@ export function getLegalEntity(): LegalEntity {
   return {
     name:
       process.env.LEGAL_ENTITY_NAME?.trim() ||
-      "eNOVA Italia — Evolvia",
+      "Enova Italia ",
     brand: "Iren Corner",
     email:
       process.env.LEGAL_PRIVACY_EMAIL?.trim() ||
