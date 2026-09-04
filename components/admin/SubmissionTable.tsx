@@ -471,7 +471,9 @@ export function SubmissionTable({
                     }
                   >
                     <td>
-                      {new Date(submission.createdAt).toLocaleString("it-IT")}
+                      {new Date(submission.createdAt).toLocaleDateString(
+                        "it-IT",
+                      )}
                     </td>
                     <td>{areaManager || "—"}</td>
                     <td>{submission.nomeCognome || "—"}</td>
