@@ -12,7 +12,7 @@ function getSecret() {
 }
 
 export function getAdminUsername() {
-  return (process.env.ADMIN_USERNAME ?? "Pinetaform").trim();
+  return (process.env.ADMIN_USERNAME ?? "enova26italia").trim();
 }
 
 function getAdminPassword() {

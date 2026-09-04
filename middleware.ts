@@ -4,7 +4,7 @@ import { jwtVerify } from "jose";
 import { getSessionSecret } from "@/lib/env";
 
 const COOKIE_NAME = "admin_session";
-const DEFAULT_USERNAME = "Pinetaform";
+const DEFAULT_USERNAME = "enova26italia";
 
 function getSecret() {
   try {
