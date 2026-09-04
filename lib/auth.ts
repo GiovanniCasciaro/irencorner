@@ -1,16 +1,48 @@
+import { createHash, timingSafeEqual } from "crypto";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { getSessionSecret } from "@/lib/env";
 
 const COOKIE_NAME = "admin_session";
-const SESSION_DURATION = "8h";
+const SESSION_DURATION = "4h";
+const SESSION_MAX_AGE_SECONDS = 60 * 60 * 4;
 
 function getSecret() {
   return getSessionSecret();
 }
 
-export async function createAdminSession() {
-  const token = await new SignJWT({ role: "admin" })
+export function getAdminUsername() {
+  return (process.env.ADMIN_USERNAME ?? "Pinetaform").trim();
+}
+
+function getAdminPassword() {
+  const expected = process.env.ADMIN_PASSWORD;
+  if (!expected) {
+    throw new Error("ADMIN_PASSWORD non configurato.");
+  }
+  return expected;
+}
+
+/** Constant-time string compare to reduce credential timing leaks. */
+export function safeEqualString(left: string, right: string) {
+  const leftBuf = Buffer.from(left);
+  const rightBuf = Buffer.from(right);
+  const digestLeft = createHash("sha256").update(leftBuf).digest();
+  const digestRight = createHash("sha256").update(rightBuf).digest();
+  return timingSafeEqual(digestLeft, digestRight) && leftBuf.length === rightBuf.length;
+}
+
+export function verifyAdminCredentials(username: string, password: string) {
+  const usernameOk = safeEqualString(username.trim(), getAdminUsername());
+  const passwordOk = safeEqualString(password, getAdminPassword());
+  return usernameOk && passwordOk;
+}
+
+export async function createAdminSession(username: string) {
+  const token = await new SignJWT({
+    role: "admin",
+    username,
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(SESSION_DURATION)
@@ -20,15 +52,21 @@ export async function createAdminSession() {
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "strict",
     path: "/",
-    maxAge: 60 * 60 * 8,
+    maxAge: SESSION_MAX_AGE_SECONDS,
   });
 }
 
 export async function clearAdminSession() {
   const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
+  cookieStore.set(COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+  });
 }
 
 export async function isAdminAuthenticated() {
@@ -37,17 +75,15 @@ export async function isAdminAuthenticated() {
   if (!token) return false;
 
   try {
-    await jwtVerify(token, getSecret());
-    return true;
+    const { payload } = await jwtVerify(token, getSecret());
+    return (
+      payload.role === "admin" &&
+      typeof payload.username === "string" &&
+      safeEqualString(payload.username, getAdminUsername())
+    );
   } catch {
     return false;
   }
 }
 
-export function verifyAdminPassword(password: string) {
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected) {
-    throw new Error("ADMIN_PASSWORD non configurato.");
-  }
-  return password === expected;
-}
+export { COOKIE_NAME as ADMIN_SESSION_COOKIE };

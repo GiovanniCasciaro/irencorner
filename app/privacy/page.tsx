@@ -61,7 +61,12 @@ export default function PrivacyPage() {
               </li>
               <li>
                 dati tecnici di navigazione (indirizzo IP, log, cookie tecnici)
-                necessari alla sicurezza e al funzionamento del sito.
+                necessari alla sicurezza e al funzionamento del sito;
+              </li>
+              <li>
+                dati di autenticazione tecnica dell&apos;area admin (username
+                operativo e log di sicurezza degli accessi), trattati solo per
+                proteggere i dati delle candidature.
               </li>
             </ul>
           </section>
@@ -80,7 +85,9 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <strong>Sicurezza e funzionamento del sito</strong> — interesse
-                legittimo (art. 6.1.f GDPR).
+                legittimo (art. 6.1.f GDPR), incluse autenticazione dell&apos;area
+                admin, limitazione dei tentativi di accesso e cookie di sessione
+                tecnici.
               </li>
               <li>
                 <strong>Comunicazioni informative/commerciali</strong> — solo
@@ -93,12 +100,16 @@ export default function PrivacyPage() {
             <h2>4. Modalità del trattamento e conservazione</h2>
             <p>
               I dati sono trattati con strumenti elettronici e misure tecniche
-              organizzative adeguate. Le candidature sono conservate per il tempo
-              necessario alla valutazione del mandato e, in caso di
-              instaurazione del rapporto, per la durata dello stesso e dei
-              relativi obblighi di legge. In assenza di esito positivo, i dati
-              sono di norma cancellati o anonimizzati entro 24 mesi
-              dall&apos;invio, salvo diversa necessità legale.
+              organizzative adeguate (accesso admin con username e password,
+              sessione cifrata, cookie HttpOnly, limitazione tentativi di login).
+              Le candidature sono conservate per il tempo necessario alla
+              valutazione del mandato e, in caso di instaurazione del rapporto,
+              per la durata dello stesso e dei relativi obblighi di legge. In
+              assenza di esito positivo, i dati sono di norma cancellati o
+              anonimizzati entro 24 mesi dall&apos;invio, salvo diversa necessità
+              legale. I log di sicurezza degli accessi admin sono conservati
+              solo per il tempo strettamente necessario alla protezione del
+              sistema.
             </p>
           </section>
 

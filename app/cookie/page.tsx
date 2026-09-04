@@ -51,8 +51,11 @@ export default function CookiePage() {
                   <tr>
                     <td>Necessari</td>
                     <td>admin_session</td>
-                    <td>Autenticazione area admin protetta</td>
-                    <td>Sessione / scadenza tecnica</td>
+                    <td>
+                      Cookie tecnico HttpOnly per autenticazione area admin
+                      (username + password). Non è un cookie di profilazione.
+                    </td>
+                    <td>Max 4 ore</td>
                   </tr>
                   <tr>
                     <td>Necessari</td>
