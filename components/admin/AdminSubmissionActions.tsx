@@ -31,6 +31,7 @@ export function AdminSubmissionActions({
       });
       const data = (await response.json().catch(() => null)) as {
         error?: string;
+        submission?: { readAt?: string | null };
       } | null;
 
       if (!response.ok) {
@@ -38,13 +39,17 @@ export function AdminSubmissionActions({
       }
 
       if (action === "purge") {
-        router.push("/admin");
+        router.push("/admin?tab=trash");
         router.refresh();
         return;
       }
 
-      // Force a fresh list so tabs reflect the new status immediately.
-      router.push("/admin");
+      if (action === "trash") {
+        router.push("/admin?tab=trash");
+      } else if (action === "restore") {
+        const restoredRead = Boolean(data?.submission?.readAt ?? readAt);
+        router.push(restoredRead ? "/admin?tab=read" : "/admin?tab=unread");
+      }
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Operazione non riuscita.");

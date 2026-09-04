@@ -55,16 +55,39 @@ function isTrash(row: SubmissionRow) {
   return Boolean(row.deletedAt);
 }
 
+function toRow(submission: SubmissionRow & Record<string, unknown>): SubmissionRow {
+  return {
+    id: String(submission.id),
+    createdAt: String(submission.createdAt),
+    email: String(submission.email),
+    ragioneSociale: String(submission.ragioneSociale),
+    partitaIva: String(submission.partitaIva),
+    provincia: String(submission.provincia),
+    comune: String(submission.comune),
+    excelUrl:
+      typeof submission.excelUrl === "string" ? submission.excelUrl : null,
+    readAt: typeof submission.readAt === "string" ? submission.readAt : null,
+    deletedAt:
+      typeof submission.deletedAt === "string" ? submission.deletedAt : null,
+  };
+}
+
 export function SubmissionTable({
   submissions,
+  initialSection = "unread",
 }: {
   submissions: SubmissionRow[];
+  initialSection?: AdminSection;
 }) {
   const router = useRouter();
-  const [section, setSection] = useState<AdminSection>("unread");
+  const [section, setSection] = useState<AdminSection>(initialSection);
   const [rows, setRows] = useState<SubmissionRow[]>(submissions);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    setSection(initialSection);
+  }, [initialSection]);
 
   useEffect(() => {
     setRows(submissions);
@@ -84,6 +107,11 @@ export function SubmissionTable({
     if (section === "read") return rows.filter(isRead);
     return rows.filter(isTrash);
   }, [section, rows]);
+
+  function goToSection(next: AdminSection) {
+    setSection(next);
+    router.replace(`/admin?tab=${next}`, { scroll: false });
+  }
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -107,41 +135,21 @@ export function SubmissionTable({
 
       if (action === "purge") {
         setRows((current) => current.filter((row) => row.id !== id));
-        setSection("trash");
+        goToSection("trash");
       } else if (result.submission) {
-        const updated: SubmissionRow = {
-          id: result.submission.id,
-          createdAt: String(result.submission.createdAt),
-          email: String(result.submission.email),
-          ragioneSociale: String(result.submission.ragioneSociale),
-          partitaIva: String(result.submission.partitaIva),
-          provincia: String(result.submission.provincia),
-          comune: String(result.submission.comune),
-          excelUrl:
-            typeof result.submission.excelUrl === "string"
-              ? result.submission.excelUrl
-              : null,
-          readAt:
-            typeof result.submission.readAt === "string"
-              ? result.submission.readAt
-              : null,
-          deletedAt:
-            typeof result.submission.deletedAt === "string"
-              ? result.submission.deletedAt
-              : null,
-        };
-
+        const updated = toRow(result.submission);
         setRows((current) =>
           current.map((row) => (row.id === id ? updated : row)),
         );
 
         if (action === "trash") {
-          setSection("trash");
+          goToSection("trash");
         } else if (action === "restore") {
-          setSection(updated.readAt ? "read" : "unread");
+          goToSection(updated.readAt ? "read" : "unread");
         }
       }
 
+      // Refresh after local state update so server props catch up to mailbox.
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Operazione non riuscita.");
@@ -175,7 +183,7 @@ export function SubmissionTable({
           role="tab"
           aria-selected={section === "unread"}
           className={`admin-tab ${section === "unread" ? "is-active" : ""}`}
-          onClick={() => setSection("unread")}
+          onClick={() => goToSection("unread")}
         >
           Da leggere
           <span className="admin-tab__count">{counts.unread}</span>
@@ -185,7 +193,7 @@ export function SubmissionTable({
           role="tab"
           aria-selected={section === "read"}
           className={`admin-tab ${section === "read" ? "is-active" : ""}`}
-          onClick={() => setSection("read")}
+          onClick={() => goToSection("read")}
         >
           Lette
           <span className="admin-tab__count">{counts.read}</span>
@@ -195,7 +203,7 @@ export function SubmissionTable({
           role="tab"
           aria-selected={section === "trash"}
           className={`admin-tab ${section === "trash" ? "is-active" : ""}`}
-          onClick={() => setSection("trash")}
+          onClick={() => goToSection("trash")}
         >
           Cestino
           <span className="admin-tab__count">{counts.trash}</span>
@@ -256,6 +264,7 @@ export function SubmissionTable({
                     <Link
                       className="btn btn-ghost btn-small"
                       href={`/admin/${submission.id}`}
+                      prefetch={false}
                     >
                       Dettaglio
                     </Link>

@@ -1,17 +1,30 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { AdminListRefresh } from "@/components/admin/AdminListRefresh";
 import { SubmissionTable } from "@/components/admin/SubmissionTable";
 import { listSubmissions } from "@/lib/store";
 
-export default async function AdminPage() {
+type AdminTab = "unread" | "read" | "trash";
+
+function parseTab(value: string | undefined): AdminTab {
+  if (value === "read" || value === "trash" || value === "unread") {
+    return value;
+  }
+  return "unread";
+}
+
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const params = await searchParams;
   const submissions = await listSubmissions();
 
   return (
     <main className="admin-shell">
-      <AdminListRefresh />
       <SubmissionTable
+        initialSection={parseTab(params.tab)}
         submissions={submissions.map((submission) => ({
           id: submission.id,
           createdAt: submission.createdAt,

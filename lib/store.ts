@@ -10,6 +10,14 @@ import {
   writeBlob,
 } from "@/lib/blob-access";
 import { buildExcelFileName, buildWorkbook } from "@/lib/excel";
+import {
+  applyMailboxStatus,
+  loadMailboxState,
+  removeMailboxEntry,
+  saveMailboxState,
+  updateMailboxEntry,
+  type MailboxState,
+} from "@/lib/mailbox";
 import type { Submission, SubmissionData } from "@/lib/types";
 
 const DATA_ROOT = path.join(process.cwd(), "data", "submissions");
@@ -42,7 +50,9 @@ function normalizeSubmission(submission: Submission): Submission {
 }
 
 async function persistSubmissionRecord(submission: Submission) {
-  const payload = JSON.stringify(submission);
+  // Keep data.json free of mailbox status so CDN-cached payload cannot overwrite status.
+  const { readAt: _readAt, deletedAt: _deletedAt, ...rest } = submission;
+  const payload = JSON.stringify(rest);
 
   if (hasBlobStorage()) {
     await writeBlob(
@@ -55,7 +65,10 @@ async function persistSubmissionRecord(submission: Submission) {
   }
 
   await mkdir(localDir(submission.id), { recursive: true });
-  await writeFile(localDataPath(submission.id), JSON.stringify(submission, null, 2));
+  await writeFile(
+    localDataPath(submission.id),
+    JSON.stringify(rest, null, 2),
+  );
 }
 
 async function saveToBlob(submission: Submission, excelBuffer: Buffer) {
@@ -82,10 +95,7 @@ async function saveLocally(
   submission.excelUrl = adminExcelUrl(submission.id);
   await mkdir(localDir(submission.id), { recursive: true });
   await writeFile(localExcelPath(submission.id, fileName), excelBuffer);
-  await writeFile(
-    localDataPath(submission.id),
-    JSON.stringify(submission, null, 2),
-  );
+  await persistSubmissionRecord(submission);
 }
 
 export async function createSubmission(
@@ -121,6 +131,7 @@ export async function createSubmission(
     } else {
       await saveLocally(submission, excelBuffer, fileName);
     }
+    await updateMailboxEntry(id, { readAt: null, deletedAt: null });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Errore storage sconosciuto";
@@ -135,8 +146,36 @@ export async function createSubmission(
   return normalizeSubmission(submission);
 }
 
+async function migrateLegacyMailboxEntries(
+  submissions: Submission[],
+  mailbox: MailboxState,
+): Promise<MailboxState> {
+  let changed = false;
+  const next: MailboxState = { ...mailbox };
+
+  for (const submission of submissions) {
+    if (next[submission.id]) {
+      continue;
+    }
+    if (submission.readAt || submission.deletedAt) {
+      next[submission.id] = {
+        readAt: submission.readAt ?? null,
+        deletedAt: submission.deletedAt ?? null,
+      };
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    await saveMailboxState(next);
+  }
+
+  return next;
+}
+
 export async function listSubmissions(): Promise<Submission[]> {
   let submissions: Submission[] = [];
+  let mailbox = await loadMailboxState();
 
   if (hasBlobStorage()) {
     const dataBlobs = await listSubmissionDataBlobs();
@@ -150,9 +189,7 @@ export async function listSubmissions(): Promise<Submission[]> {
         }
       }),
     );
-    submissions = results
-      .filter((item): item is Submission => item !== null)
-      .map(normalizeSubmission);
+    submissions = results.filter((item): item is Submission => item !== null);
   } else {
     try {
       const dirs = await readdir(DATA_ROOT, { withFileTypes: true });
@@ -168,15 +205,17 @@ export async function listSubmissions(): Promise<Submission[]> {
             }
           }),
       );
-      submissions = results
-        .filter((item): item is Submission => item !== null)
-        .map(normalizeSubmission);
+      submissions = results.filter((item): item is Submission => item !== null);
     } catch {
       submissions = [];
     }
   }
 
-  return submissions.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  mailbox = await migrateLegacyMailboxEntries(submissions, mailbox);
+
+  return submissions
+    .map((item) => normalizeSubmission(applyMailboxStatus(item, mailbox)))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 export async function getSubmission(id: string): Promise<Submission | null> {
@@ -198,7 +237,12 @@ export async function getSubmission(id: string): Promise<Submission | null> {
     }
   }
 
-  return submission ? normalizeSubmission(submission) : null;
+  if (!submission) {
+    return null;
+  }
+
+  const mailbox = await loadMailboxState();
+  return normalizeSubmission(applyMailboxStatus(submission, mailbox));
 }
 
 export async function markSubmissionRead(id: string): Promise<Submission | null> {
@@ -211,9 +255,14 @@ export async function markSubmissionRead(id: string): Promise<Submission | null>
     return submission;
   }
 
-  submission.readAt = new Date().toISOString();
-  await persistSubmissionRecord(submission);
-  return normalizeSubmission(submission);
+  const entry = await updateMailboxEntry(id, {
+    readAt: new Date().toISOString(),
+  });
+  return normalizeSubmission({
+    ...submission,
+    readAt: entry.readAt,
+    deletedAt: entry.deletedAt,
+  });
 }
 
 export async function softDeleteSubmission(
@@ -224,9 +273,16 @@ export async function softDeleteSubmission(
     return null;
   }
 
-  submission.deletedAt = new Date().toISOString();
-  await persistSubmissionRecord(submission);
-  return normalizeSubmission(submission);
+  const entry = await updateMailboxEntry(id, {
+    deletedAt: new Date().toISOString(),
+    readAt: submission.readAt ?? null,
+  });
+
+  return normalizeSubmission({
+    ...submission,
+    readAt: entry.readAt,
+    deletedAt: entry.deletedAt,
+  });
 }
 
 export async function restoreSubmission(id: string): Promise<Submission | null> {
@@ -235,9 +291,16 @@ export async function restoreSubmission(id: string): Promise<Submission | null> 
     return null;
   }
 
-  submission.deletedAt = null;
-  await persistSubmissionRecord(submission);
-  return normalizeSubmission(submission);
+  const entry = await updateMailboxEntry(id, {
+    deletedAt: null,
+    readAt: submission.readAt ?? null,
+  });
+
+  return normalizeSubmission({
+    ...submission,
+    readAt: entry.readAt,
+    deletedAt: entry.deletedAt,
+  });
 }
 
 export async function permanentlyDeleteSubmission(id: string): Promise<boolean> {
@@ -252,6 +315,7 @@ export async function permanentlyDeleteSubmission(id: string): Promise<boolean> 
     await rm(localDir(id), { recursive: true, force: true });
   }
 
+  await removeMailboxEntry(id);
   return true;
 }
 
