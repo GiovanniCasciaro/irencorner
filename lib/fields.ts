@@ -36,15 +36,22 @@ export const FIELD_KEYS = [
 
 export type FieldKey = (typeof FIELD_KEYS)[number];
 
+/** Campi salvati e mostrati in admin ma esclusi dall'Excel. */
+export const ADMIN_ONLY_FIELD_KEYS = ["telefono"] as const;
+export type AdminOnlyFieldKey = (typeof ADMIN_ONLY_FIELD_KEYS)[number];
+export type FormFieldKey = FieldKey | AdminOnlyFieldKey;
+
 export const EXCEL_COLUMN_COUNT = FIELD_KEYS.length;
 export const EXCEL_RANGE = `A1:${String.fromCharCode(64 + EXCEL_COLUMN_COUNT)}2`;
 
 export const FORM_FIELDS: Array<{
-  key: FieldKey;
+  key: FormFieldKey;
   label: string;
   section: "areaManager" | "legal" | "operativo";
-  type?: "text" | "email" | "textarea" | "yesno";
+  type?: "text" | "email" | "tel" | "textarea" | "yesno";
   placeholder?: string;
+  /** Se false, il campo non finisce nell'Excel generato. */
+  includeInExcel?: boolean;
 }> = [
   {
     key: "areaManagerNome",
@@ -64,6 +71,14 @@ export const FORM_FIELDS: Array<{
     section: "legal",
     type: "email",
     placeholder: "nome@azienda.it",
+  },
+  {
+    key: "telefono",
+    label: "Numero di telefono",
+    section: "legal",
+    type: "tel",
+    placeholder: "+39 333 1234567",
+    includeInExcel: false,
   },
   {
     key: "nomeCognome",

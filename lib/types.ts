@@ -1,6 +1,7 @@
-import type { FieldKey } from "@/lib/fields";
+import type { AdminOnlyFieldKey, FieldKey } from "@/lib/fields";
 
-export type SubmissionData = Record<FieldKey, string>;
+export type SubmissionData = Record<FieldKey, string> &
+  Partial<Record<AdminOnlyFieldKey, string>>;
 
 export type Submission = SubmissionData & {
   id: string;

@@ -73,6 +73,7 @@ export async function POST(request: Request) {
       areaManagerNome: String(formData.get("areaManagerNome") ?? ""),
       areaManagerCognome: String(formData.get("areaManagerCognome") ?? ""),
       email: String(formData.get("email") ?? ""),
+      telefono: String(formData.get("telefono") ?? "").trim(),
       nomeCognome: String(formData.get("nomeCognome") ?? ""),
       ragioneSociale: String(formData.get("ragioneSociale") ?? ""),
       partitaIva: String(formData.get("partitaIva") ?? "").replace(/\s/g, ""),

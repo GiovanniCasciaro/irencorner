@@ -134,6 +134,13 @@ export function PartnerForm() {
                 type={field.type ?? "text"}
                 placeholder={field.placeholder}
                 required
+                autoComplete={
+                  field.type === "tel"
+                    ? "tel"
+                    : field.type === "email"
+                      ? "email"
+                      : undefined
+                }
               />
             </div>
           ))}

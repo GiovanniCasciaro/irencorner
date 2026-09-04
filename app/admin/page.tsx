@@ -29,6 +29,7 @@ export default async function AdminPage({
           id: submission.id,
           createdAt: submission.createdAt,
           email: submission.email,
+          telefono: submission.telefono ?? "",
           areaManagerNome: submission.areaManagerNome ?? "",
           areaManagerCognome: submission.areaManagerCognome ?? "",
           nomeCognome: submission.nomeCognome ?? "",

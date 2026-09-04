@@ -99,7 +99,7 @@ export default async function AdminDetailPage({
             {legalFields.map((field) => (
               <div className="detail-item" key={field.key}>
                 <span>{field.label}</span>
-                <strong>{submission[field.key]}</strong>
+                <strong>{submission[field.key] || "—"}</strong>
               </div>
             ))}
           </div>

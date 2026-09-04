@@ -6,6 +6,15 @@ export const submissionSchema = z.object({
     .string()
     .min(2, "Inserisci il cognome dell'Area Manager."),
   email: z.string().email("Inserisci un indirizzo email valido."),
+  telefono: z
+    .string()
+    .trim()
+    .min(8, "Inserisci un numero di telefono valido.")
+    .max(20, "Il numero di telefono è troppo lungo.")
+    .regex(
+      /^[+0-9][\d\s().-]{6,18}\d$/,
+      "Inserisci un numero di telefono valido.",
+    ),
   nomeCognome: z.string().min(2, "Inserisci nome e cognome."),
   ragioneSociale: z.string().min(2, "Inserisci la ragione sociale."),
   partitaIva: z

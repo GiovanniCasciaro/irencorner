@@ -11,6 +11,7 @@ export type SubmissionRow = {
   id: string;
   createdAt: string;
   email: string;
+  telefono: string;
   areaManagerNome: string;
   areaManagerCognome: string;
   nomeCognome: string;
@@ -80,6 +81,7 @@ function toRow(submission: SubmissionRow & Record<string, unknown>): SubmissionR
     id: String(submission.id),
     createdAt: String(submission.createdAt),
     email: String(submission.email ?? ""),
+    telefono: String(submission.telefono ?? ""),
     areaManagerNome: String(submission.areaManagerNome ?? ""),
     areaManagerCognome: String(submission.areaManagerCognome ?? ""),
     nomeCognome: String(submission.nomeCognome ?? ""),
@@ -108,6 +110,7 @@ function matchesSearch(row: SubmissionRow, query: string) {
       row.nomeCognome,
       row.ragioneSociale,
       row.email,
+      row.telefono,
       row.partitaIva,
       row.comune,
       row.provincia,
@@ -326,7 +329,7 @@ export function SubmissionTable({
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Nome, cognome, Area Manager, ragione sociale, email..."
+            placeholder="Nome, cognome, Area Manager, ragione sociale, email, telefono..."
           />
         </div>
 
@@ -436,6 +439,7 @@ export function SubmissionTable({
               <th>Titolare</th>
               <th>Ragione sociale</th>
               <th>Email</th>
+              <th>Telefono</th>
               <th>P.IVA</th>
               <th>Comune</th>
               <th>Prov.</th>
@@ -448,7 +452,7 @@ export function SubmissionTable({
           <tbody>
             {visible.length === 0 ? (
               <tr>
-                <td colSpan={12}>
+                <td colSpan={13}>
                   {hasActiveFilters
                     ? "Nessuna candidatura corrisponde a ricerca/filtri."
                     : section === "unread"
@@ -485,6 +489,7 @@ export function SubmissionTable({
                       )}
                     </td>
                     <td>{submission.email}</td>
+                    <td>{submission.telefono || "—"}</td>
                     <td>{submission.partitaIva}</td>
                     <td>{submission.comune}</td>
                     <td>{submission.provincia}</td>
