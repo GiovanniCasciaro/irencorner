@@ -23,6 +23,9 @@ export default async function AdminDetailPage({
     submission = (await markSubmissionRead(id)) ?? submission;
   }
 
+  const areaManagerFields = FORM_FIELDS.filter(
+    (field) => field.section === "areaManager",
+  );
   const legalFields = FORM_FIELDS.filter((field) => field.section === "legal");
   const operativoFields = FORM_FIELDS.filter(
     (field) => field.section === "operativo",
@@ -76,9 +79,21 @@ export default async function AdminDetailPage({
         </div>
 
         <div
-          className="form-section form-section--legal"
+          className="form-section form-section--area-manager"
           style={{ marginTop: "1.5rem" }}
         >
+          <h3>Area Manager</h3>
+          <div className="detail-grid">
+            {areaManagerFields.map((field) => (
+              <div className="detail-item" key={field.key}>
+                <span>{field.label}</span>
+                <strong>{submission[field.key] || "—"}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="form-section form-section--legal">
           <h3>Dati legali e contatto</h3>
           <div className="detail-grid">
             {legalFields.map((field) => (

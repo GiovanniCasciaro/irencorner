@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 export const submissionSchema = z.object({
+  areaManagerNome: z.string().min(2, "Inserisci il nome dell'Area Manager."),
+  areaManagerCognome: z
+    .string()
+    .min(2, "Inserisci il cognome dell'Area Manager."),
   email: z.string().email("Inserisci un indirizzo email valido."),
   nomeCognome: z.string().min(2, "Inserisci nome e cognome."),
   ragioneSociale: z.string().min(2, "Inserisci la ragione sociale."),

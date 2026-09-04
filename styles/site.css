@@ -405,6 +405,15 @@ img {
   border-color: rgba(0, 51, 160, 0.18);
 }
 
+.form-section--area-manager {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 51, 153, 0.08),
+    rgba(102, 51, 153, 0.02)
+  );
+  border-color: rgba(102, 51, 153, 0.22);
+}
+
 .form-section--operativo {
   background: linear-gradient(
     135deg,
@@ -419,8 +428,19 @@ img {
   font-size: 1rem;
 }
 
+.form-section-intro {
+  margin: -0.35rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
 .form-section--legal h3 {
   color: var(--legal-accent);
+}
+
+.form-section--area-manager h3 {
+  color: #663399;
 }
 
 .form-section--operativo h3 {

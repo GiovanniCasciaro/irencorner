@@ -70,6 +70,8 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const payload = {
+      areaManagerNome: String(formData.get("areaManagerNome") ?? ""),
+      areaManagerCognome: String(formData.get("areaManagerCognome") ?? ""),
       email: String(formData.get("email") ?? ""),
       nomeCognome: String(formData.get("nomeCognome") ?? ""),
       ragioneSociale: String(formData.get("ragioneSociale") ?? ""),

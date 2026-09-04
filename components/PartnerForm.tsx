@@ -75,6 +75,9 @@ export function PartnerForm() {
     }
   }
 
+  const areaManagerFields = FORM_FIELDS.filter(
+    (field) => field.section === "areaManager",
+  );
   const legalFields = FORM_FIELDS.filter((field) => field.section === "legal");
   const profileFields = FORM_FIELDS.filter(
     (field) =>
@@ -95,6 +98,30 @@ export function PartnerForm() {
       method="post"
       onSubmit={handleSubmit}
     >
+      <div className="form-section form-section--area-manager">
+        <h3>Area Manager</h3>
+        <p className="form-section-intro">
+          Inserisci i dati anagrafici di chi compila il form.
+        </p>
+        <div className="input-row">
+          {areaManagerFields.map((field) => (
+            <div className="input-group" key={field.key}>
+              <label htmlFor={field.key}>{field.label}</label>
+              <input
+                id={field.key}
+                name={field.key}
+                type="text"
+                placeholder={field.placeholder}
+                required
+                autoComplete={
+                  field.key === "areaManagerNome" ? "given-name" : "family-name"
+                }
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="form-section form-section--legal">
         <h3>Dati legali e contatto</h3>
         <div className="input-row">

@@ -1,8 +1,14 @@
 import ExcelJS from "exceljs";
 import JSZip from "jszip";
-import { EXCEL_HEADERS, FIELD_KEYS } from "@/lib/fields";
+import {
+  EXCEL_COLUMN_COUNT,
+  EXCEL_HEADERS,
+  EXCEL_RANGE,
+  FIELD_KEYS,
+} from "@/lib/fields";
 import type { Submission } from "@/lib/types";
 
+const AREA_MANAGER_FILL = "FFE8D5F5";
 const LEGAL_FILL = "FFBDD7EE";
 const OPERATIVO_FILL = "FFF8CBAD";
 const DATA_FILL = "FFFFFF00";
@@ -31,11 +37,17 @@ export function buildExcelFileName(submission: Pick<Submission, "ragioneSociale"
   return `candidatura-${slug}.xlsx`;
 }
 
+function headerFillForIndex(index: number) {
+  if (index < 2) return AREA_MANAGER_FILL;
+  if (index < 7) return LEGAL_FILL;
+  return OPERATIVO_FILL;
+}
+
 function styleHeaderCell(cell: ExcelJS.Cell, index: number) {
   cell.fill = {
     type: "pattern",
     pattern: "solid",
-    fgColor: { argb: index < 5 ? LEGAL_FILL : OPERATIVO_FILL },
+    fgColor: { argb: headerFillForIndex(index) },
   };
   cell.border = {
     top: { style: "thin", color: { argb: "FF999999" } },
@@ -86,7 +98,7 @@ function trimWorksheetToTwoRows(sheet: ExcelJS.Worksheet) {
     });
   }
 
-  sheet.pageSetup.printArea = "A1:M2";
+  sheet.pageSetup.printArea = EXCEL_RANGE;
   hideUnusedRows(sheet);
 }
 
@@ -125,7 +137,7 @@ async function enforceTwoRowXlsx(buffer: Buffer) {
   }
 
   let xml = await sheetFile.async("string");
-  xml = xml.replace(/<dimension ref="[^"]+"/, '<dimension ref="A1:M2"');
+  xml = xml.replace(/<dimension ref="[^"]+"/, `<dimension ref="${EXCEL_RANGE}"`);
   xml = xml.replace(
     /<row\b[^>]*\br="(\d+)"[^>]*>[\s\S]*?<\/row>/g,
     (match, rowNumber) => (Number(rowNumber) <= 2 ? match : ""),
@@ -133,7 +145,7 @@ async function enforceTwoRowXlsx(buffer: Buffer) {
 
   const hiddenRows = Array.from({ length: 498 }, (_, index) => {
     const rowNumber = index + 3;
-    return `<row r="${rowNumber}" hidden="1" spans="1:13"/>`;
+    return `<row r="${rowNumber}" hidden="1" spans="1:${EXCEL_COLUMN_COUNT}"/>`;
   }).join("");
   xml = xml.replace("</sheetData>", `${hiddenRows}</sheetData>`);
 
