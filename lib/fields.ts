@@ -1,6 +1,4 @@
 export const EXCEL_HEADERS = [
-  "Nome Area Manager",
-  "Cognome Area Manager",
   "Indirizzo e-mail a cui inviare il contratto",
   "Nome e Cognome titolare / Amministratore",
   "Ragione sociale (come in visura camerale)",
@@ -16,9 +14,8 @@ export const EXCEL_HEADERS = [
   "Altri competitor presenti",
 ] as const;
 
+/** Campi scritti nel file Excel generato. */
 export const FIELD_KEYS = [
-  "areaManagerNome",
-  "areaManagerCognome",
   "email",
   "nomeCognome",
   "ragioneSociale",
@@ -37,7 +34,11 @@ export const FIELD_KEYS = [
 export type FieldKey = (typeof FIELD_KEYS)[number];
 
 /** Campi salvati e mostrati in admin ma esclusi dall'Excel. */
-export const ADMIN_ONLY_FIELD_KEYS = ["telefono"] as const;
+export const ADMIN_ONLY_FIELD_KEYS = [
+  "areaManagerNome",
+  "areaManagerCognome",
+  "telefono",
+] as const;
 export type AdminOnlyFieldKey = (typeof ADMIN_ONLY_FIELD_KEYS)[number];
 export type FormFieldKey = FieldKey | AdminOnlyFieldKey;
 
@@ -58,16 +59,18 @@ export const FORM_FIELDS: Array<{
     label: "Nome",
     section: "areaManager",
     placeholder: "Mario",
+    includeInExcel: false,
   },
   {
     key: "areaManagerCognome",
     label: "Cognome",
     section: "areaManager",
     placeholder: "Rossi",
+    includeInExcel: false,
   },
   {
     key: "email",
-    label: EXCEL_HEADERS[2],
+    label: EXCEL_HEADERS[0],
     section: "legal",
     type: "email",
     placeholder: "nome@azienda.it",
@@ -82,73 +85,73 @@ export const FORM_FIELDS: Array<{
   },
   {
     key: "nomeCognome",
-    label: EXCEL_HEADERS[3],
+    label: EXCEL_HEADERS[1],
     section: "legal",
     placeholder: "Mario Rossi",
   },
   {
     key: "ragioneSociale",
-    label: EXCEL_HEADERS[4],
+    label: EXCEL_HEADERS[2],
     section: "legal",
     placeholder: "Azienda S.r.l.",
   },
   {
     key: "partitaIva",
-    label: EXCEL_HEADERS[5],
+    label: EXCEL_HEADERS[3],
     section: "legal",
     placeholder: "12345678901",
   },
   {
     key: "sedeLegale",
-    label: EXCEL_HEADERS[6],
+    label: EXCEL_HEADERS[4],
     section: "legal",
     placeholder: "Via Roma 1, 00100 Roma (RM)",
   },
   {
     key: "indirizzoOperativo",
-    label: EXCEL_HEADERS[7],
+    label: EXCEL_HEADERS[5],
     section: "operativo",
     placeholder: "Via Milano 10",
   },
   {
     key: "comune",
-    label: EXCEL_HEADERS[8],
+    label: EXCEL_HEADERS[6],
     section: "operativo",
     placeholder: "Milano",
   },
   {
     key: "cap",
-    label: EXCEL_HEADERS[9],
+    label: EXCEL_HEADERS[7],
     section: "operativo",
     placeholder: "20100",
   },
   {
     key: "provincia",
-    label: EXCEL_HEADERS[10],
+    label: EXCEL_HEADERS[8],
     section: "operativo",
     placeholder: "MI",
   },
   {
     key: "regione",
-    label: EXCEL_HEADERS[11],
+    label: EXCEL_HEADERS[9],
     section: "operativo",
     placeholder: "Lombardia",
   },
   {
     key: "tipologiaAttivita",
-    label: EXCEL_HEADERS[12],
+    label: EXCEL_HEADERS[10],
     section: "operativo",
     placeholder: "Agenzia immobiliare, negozio energia, ecc.",
   },
   {
     key: "esperienzaEnergetico",
-    label: EXCEL_HEADERS[13],
+    label: EXCEL_HEADERS[11],
     section: "operativo",
     type: "yesno",
   },
   {
     key: "altriCompetitor",
-    label: EXCEL_HEADERS[14],
+    label: EXCEL_HEADERS[12],
     section: "operativo",
     type: "textarea",
     placeholder: "Elenca altri competitor presenti",

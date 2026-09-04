@@ -8,7 +8,6 @@ import {
 } from "@/lib/fields";
 import type { Submission } from "@/lib/types";
 
-const AREA_MANAGER_FILL = "FFE8D5F5";
 const LEGAL_FILL = "FFBDD7EE";
 const OPERATIVO_FILL = "FFF8CBAD";
 const DATA_FILL = "FFFFFF00";
@@ -37,9 +36,9 @@ export function buildExcelFileName(submission: Pick<Submission, "ragioneSociale"
   return `candidatura-${slug}.xlsx`;
 }
 
+/** Colonne A–E legali (blu), F–M operative (arancio). */
 function headerFillForIndex(index: number) {
-  if (index < 2) return AREA_MANAGER_FILL;
-  if (index < 7) return LEGAL_FILL;
+  if (index < 5) return LEGAL_FILL;
   return OPERATIVO_FILL;
 }
 

@@ -48,7 +48,7 @@ export async function notifyNewSubmission(
   const text = [
     "È disponibile una nuova codifica su Iren Corner.",
     "",
-    `Area Manager: ${submission.areaManagerNome} ${submission.areaManagerCognome}`,
+    `Area Manager: ${submission.areaManagerNome ?? ""} ${submission.areaManagerCognome ?? ""}`.trim(),
     `Ragione sociale: ${submission.ragioneSociale}`,
     `Nome e cognome: ${submission.nomeCognome}`,
     `Email: ${submission.email}`,
@@ -62,7 +62,7 @@ export async function notifyNewSubmission(
   const html = `
     <p>È disponibile una nuova codifica su <strong>Iren Corner</strong>.</p>
     <ul>
-      <li><strong>Area Manager:</strong> ${escapeHtml(submission.areaManagerNome)} ${escapeHtml(submission.areaManagerCognome)}</li>
+      <li><strong>Area Manager:</strong> ${escapeHtml(submission.areaManagerNome ?? "")} ${escapeHtml(submission.areaManagerCognome ?? "")}</li>
       <li><strong>Ragione sociale:</strong> ${escapeHtml(submission.ragioneSociale)}</li>
       <li><strong>Nome e cognome:</strong> ${escapeHtml(submission.nomeCognome)}</li>
       <li><strong>Email:</strong> ${escapeHtml(submission.email)}</li>
