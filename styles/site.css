@@ -764,6 +764,10 @@ input:disabled {
   word-break: break-word;
 }
 
+.detail-item--full {
+  grid-column: 1 / -1;
+}
+
 .login-form {
   max-width: 420px;
   margin: 4rem auto;

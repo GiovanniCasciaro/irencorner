@@ -34,6 +34,11 @@ export const submissionSchema = z.object({
     message: "Seleziona Sì o No per l'esperienza nel settore energetico.",
   }),
   altriCompetitor: z.string().min(2, "Indica gli altri competitor presenti."),
+  noteAggiuntive: z
+    .string()
+    .trim()
+    .max(2000, "Le note aggiuntive non possono superare i 2000 caratteri.")
+    .default(""),
   website: z.string().max(0, "Richiesta non valida."),
   privacyConsent: z.literal(true, {
     message: "Per inviare la candidatura devi accettare la Privacy Policy.",

@@ -38,6 +38,7 @@ export const ADMIN_ONLY_FIELD_KEYS = [
   "areaManagerNome",
   "areaManagerCognome",
   "telefono",
+  "noteAggiuntive",
 ] as const;
 export type AdminOnlyFieldKey = (typeof ADMIN_ONLY_FIELD_KEYS)[number];
 export type FormFieldKey = FieldKey | AdminOnlyFieldKey;
@@ -48,9 +49,10 @@ export const EXCEL_RANGE = `A1:${String.fromCharCode(64 + EXCEL_COLUMN_COUNT)}2`
 export const FORM_FIELDS: Array<{
   key: FormFieldKey;
   label: string;
-  section: "areaManager" | "legal" | "operativo";
+  section: "areaManager" | "legal" | "operativo" | "notes";
   type?: "text" | "email" | "tel" | "textarea" | "yesno";
   placeholder?: string;
+  required?: boolean;
   /** Se false, il campo non finisce nell'Excel generato. */
   includeInExcel?: boolean;
 }> = [
@@ -155,5 +157,14 @@ export const FORM_FIELDS: Array<{
     section: "operativo",
     type: "textarea",
     placeholder: "Elenca altri competitor presenti",
+  },
+  {
+    key: "noteAggiuntive",
+    label: "Note aggiuntive",
+    section: "notes",
+    type: "textarea",
+    placeholder: "Eventuali informazioni utili (facoltativo)",
+    required: false,
+    includeInExcel: false,
   },
 ];

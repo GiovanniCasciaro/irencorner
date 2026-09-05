@@ -228,6 +228,24 @@ export function PartnerForm() {
         ))}
       </div>
 
+      <div className="form-section form-section--notes">
+        <h3>Note aggiuntive</h3>
+        {FORM_FIELDS.filter((field) => field.section === "notes").map(
+          (field) => (
+            <div className="input-group" key={field.key}>
+              <label htmlFor={field.key}>{field.label}</label>
+              <textarea
+                id={field.key}
+                name={field.key}
+                placeholder={field.placeholder}
+                rows={4}
+                required={field.required !== false}
+              />
+            </div>
+          ),
+        )}
+      </div>
+
       <div className="hp-field" aria-hidden="true">
         <label htmlFor="website">Sito web</label>
         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />

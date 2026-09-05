@@ -86,6 +86,7 @@ export async function POST(request: Request) {
       tipologiaAttivita: String(formData.get("tipologiaAttivita") ?? ""),
       esperienzaEnergetico: String(formData.get("esperienzaEnergetico") ?? ""),
       altriCompetitor: String(formData.get("altriCompetitor") ?? ""),
+      noteAggiuntive: String(formData.get("noteAggiuntive") ?? ""),
       website: String(formData.get("website") ?? ""),
       privacyConsent: formData.get("privacyConsent") === "on",
       marketingConsent: formData.get("marketingConsent") === "on",
