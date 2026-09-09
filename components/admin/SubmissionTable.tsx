@@ -269,6 +269,14 @@ export function SubmissionTable({
     }
   }
 
+  const emptyMessage = hasActiveFilters
+    ? "Nessuna candidatura corrisponde a ricerca/filtri."
+    : section === "unread"
+      ? "Nessuna candidatura da leggere."
+      : section === "read"
+        ? "Nessuna candidatura letta."
+        : "Il cestino è vuoto.";
+
   return (
     <div className="admin-card">
       <div className="admin-header">
@@ -453,13 +461,7 @@ export function SubmissionTable({
             {visible.length === 0 ? (
               <tr>
                 <td colSpan={13}>
-                  {hasActiveFilters
-                    ? "Nessuna candidatura corrisponde a ricerca/filtri."
-                    : section === "unread"
-                      ? "Nessuna candidatura da leggere."
-                      : section === "read"
-                        ? "Nessuna candidatura letta."
-                        : "Il cestino è vuoto."}
+                  {emptyMessage}
                 </td>
               </tr>
             ) : (
@@ -564,6 +566,124 @@ export function SubmissionTable({
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="admin-card-list" aria-label="Elenco candidature">
+        {visible.length === 0 ? (
+          <p className="admin-mobile-empty">{emptyMessage}</p>
+        ) : (
+          visible.map((submission) => {
+            const areaManager = [
+              submission.areaManagerNome,
+              submission.areaManagerCognome,
+            ]
+              .filter(Boolean)
+              .join(" ");
+            const place = [submission.comune, submission.provincia, submission.regione]
+              .filter(Boolean)
+              .join(" · ");
+
+            return (
+              <article
+                key={`mobile-${submission.id}`}
+                className={`admin-mobile-card${
+                  isUnread(submission) ? " is-unread" : ""
+                }`}
+              >
+                <div className="admin-mobile-card__top">
+                  <h2 className="admin-mobile-card__title">
+                    {submission.ragioneSociale}
+                  </h2>
+                  <span className="admin-mobile-card__date">
+                    {new Date(submission.createdAt).toLocaleDateString("it-IT")}
+                  </span>
+                </div>
+                <div className="admin-mobile-card__meta">
+                  {areaManager ? (
+                    <p>
+                      Area Manager: <strong>{areaManager}</strong>
+                    </p>
+                  ) : null}
+                  {submission.nomeCognome ? (
+                    <p>
+                      Titolare: <strong>{submission.nomeCognome}</strong>
+                    </p>
+                  ) : null}
+                  <p>
+                    Email: <strong>{submission.email}</strong>
+                  </p>
+                  <p>
+                    Telefono: <strong>{submission.telefono || "—"}</strong>
+                  </p>
+                  <p>
+                    P.IVA: <strong>{submission.partitaIva}</strong>
+                  </p>
+                  {place ? (
+                    <p>
+                      Sede: <strong>{place}</strong>
+                    </p>
+                  ) : null}
+                </div>
+                <div className="admin-mobile-card__actions">
+                  <Link
+                    className="btn btn-ghost btn-small"
+                    href={`/admin/${submission.id}`}
+                    prefetch={false}
+                  >
+                    Dettaglio
+                  </Link>
+                  <a
+                    className="btn btn-primary btn-small"
+                    href={getSubmissionExcelDownloadUrl(submission)}
+                  >
+                    Scarica Excel
+                  </a>
+                  {section === "trash" ? (
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-small"
+                        disabled={busyId === submission.id}
+                        onClick={() => handleAction(submission.id, "restore")}
+                      >
+                        Ripristina
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-small admin-btn-danger"
+                        disabled={busyId === submission.id}
+                        onClick={() =>
+                          handleAction(
+                            submission.id,
+                            "purge",
+                            "Eliminare definitivamente questa candidatura? L'operazione non è reversibile.",
+                          )
+                        }
+                      >
+                        Elimina definitivo
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-small admin-btn-danger"
+                      disabled={busyId === submission.id}
+                      onClick={() =>
+                        handleAction(
+                          submission.id,
+                          "trash",
+                          "Spostare questa candidatura nel cestino?",
+                        )
+                      }
+                    >
+                      Elimina
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          })
+        )}
       </div>
     </div>
   );
